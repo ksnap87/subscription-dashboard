@@ -592,6 +592,14 @@ const CURR_WEEK = 'W12';
 const PREV_WEEK = 'W11';
 const W09_WEEK = 'W09';
 
+const CAT_ORDER = ['정수기','냉장고','세탁기','건조기','의류건조기','워시타워','워시콤보','의류관리기','청소기','에어컨','시스템에어컨','공기청정기','TV','식기세척기','전기레인지','김치냉장고','노트북','광파오븐전자레인지','가습기','제습기','바스에어시스템','매트리스','안마의자','비데'];
+function sortByCatOrder(cats) {
+  return cats.sort((a,b) => {
+    const ia = CAT_ORDER.indexOf(a); const ib = CAT_ORDER.indexOf(b);
+    return (ia===-1?999:ia) - (ib===-1?999:ib);
+  });
+}
+
 // ===== UTILS =====
 function fmt(n) { return n != null ? Number(n).toLocaleString() : '-'; }
 function diffStr(n) { if(n==null) return '<span style="color:#999">-</span>'; const cls=n>0?'up':n<0?'down':''; const sign=n>0?'+':''; return `<span class="${cls}">${sign}${fmt(n)}원</span>`; }
@@ -770,8 +778,8 @@ function showTop10(mode, el) {
     title = `인상 모델 (${W09_WEEK}→${CURR_WEEK}) — 총 ${items.length}건`;
   }
 
-  // 카테고리 필터 pills
-  const cats = [...new Set(items.map(c=>c.cat))];
+  // 카테고리 필터 pills (정렬 순서 적용)
+  const cats = sortByCatOrder([...new Set(items.map(c=>c.cat))]);
   let html = `<div class="card-title">${title}</div>`;
   html += '<div class="filter-pills" style="margin-bottom:12px">';
   html += `<button class="pill active" onclick="filterTop10(null,this)">전체 (TOP10)</button>`;
@@ -818,14 +826,14 @@ function filterNDTable(tableId, cat, el) {
   const parent = el.closest('.card');
   parent.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
-  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(row => {
+  document.querySelectorAll('#' + tableId + ' tr').forEach(row => {
     row.style.display = (!cat || row.dataset.cat === cat) ? '' : 'none';
   });
 }
 (function() {
   // New models - add category filter
   const newCard = document.getElementById('newTable').closest('.card');
-  const newCats = [...new Set(newModels.map(m=>m.cat))];
+  const newCats = sortByCatOrder([...new Set(newModels.map(m=>m.cat))]);
   let filterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
   filterHtml += `<button class="pill active" onclick="filterNDTable('newTable',null,this)">전체</button>`;
   newCats.forEach(cat => {
@@ -841,7 +849,7 @@ function filterNDTable(tableId, cat, el) {
   });
   // Disc models - add category filter
   const discCard = document.getElementById('discTable').closest('.card');
-  const discCats = [...new Set(discModels.map(m=>m.cat))];
+  const discCats = sortByCatOrder([...new Set(discModels.map(m=>m.cat))]);
   let discFilterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
   discFilterHtml += `<button class="pill active" onclick="filterNDTable('discTable',null,this)">전체</button>`;
   discCats.forEach(cat => {
