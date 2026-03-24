@@ -1059,15 +1059,20 @@ function filterNDTable(tableId, cat, el) {
       const cat = item.cat;
       const price = Number(item.price);
       if(!cat || !price || price <= 0) return;
-      if(!cats[cat]) cats[cat] = {brand: brandName, prices: [], count: 0};
-      cats[cat].prices.push(price);
+      if(!cats[cat]) cats[cat] = {brand: brandName, items: [], count: 0};
+      cats[cat].items.push({price, name: item.name||'', url: item.url||''});
       cats[cat].count++;
     });
     Object.values(cats).forEach(c => {
-      c.prices.sort((a,b) => a-b);
-      c.min = c.prices[0];
-      c.max = c.prices[c.prices.length-1];
-      c.avg = Math.round(c.prices.reduce((s,v) => s+v, 0) / c.prices.length);
+      c.items.sort((a,b) => a.price - b.price);
+      c.min = c.items[0].price;
+      c.minName = c.items[0].name;
+      c.minUrl = c.items[0].url;
+      c.max = c.items[c.items.length-1].price;
+      c.maxName = c.items[c.items.length-1].name;
+      c.maxUrl = c.items[c.items.length-1].url;
+      c.avg = Math.round(c.items.reduce((s,v) => s+v.price, 0) / c.items.length);
+      c.prices = c.items.map(i => i.price);
     });
     return cats;
   }
@@ -1108,11 +1113,13 @@ function filterNDTable(tableId, cat, el) {
       const minOfAll = Math.min(...brands.map(b => b.stats.min));
       brands.forEach((b, i) => {
         const isMinPrice = b.stats.min === minOfAll;
+        const minLink = b.stats.minUrl ? `<a href="${b.stats.minUrl}" target="_blank" title="${b.stats.minName}" style="color:inherit;text-decoration:underline;text-decoration-style:dotted">${fmt(b.stats.min)}원</a>` : `${fmt(b.stats.min)}원`;
+        const maxLink = b.stats.maxUrl ? `<a href="${b.stats.maxUrl}" target="_blank" title="${b.stats.maxName}" style="color:inherit;text-decoration:underline;text-decoration-style:dotted">${fmt(b.stats.max)}원</a>` : `${fmt(b.stats.max)}원`;
         html += `<tr><td style="font-weight:600;text-align:left">${i===0?cat:''}</td>`;
         html += `<td style="color:${b.color};font-weight:600">${b.name}</td>`;
-        html += `<td style="${isMinPrice?'background:#e8f5e9;font-weight:700':''}">${fmt(b.stats.min)}원</td>`;
+        html += `<td style="${isMinPrice?'background:#e8f5e9;font-weight:700':''}">${minLink}</td>`;
         html += `<td>${fmt(b.stats.avg)}원</td>`;
-        html += `<td>${fmt(b.stats.max)}원</td>`;
+        html += `<td>${maxLink}</td>`;
         html += `<td>${b.stats.count}</td></tr>`;
       });
       html += '<tr><td colspan="6" style="padding:2px;background:#eee"></td></tr>';
@@ -1133,11 +1140,13 @@ function filterNDTable(tableId, cat, el) {
       const minOfAll = Math.min(...brands.map(b => b.stats.min));
       brands.forEach((b, i) => {
         const isMinPrice = b.stats.min === minOfAll;
+        const minLink = b.stats.minUrl ? `<a href="${b.stats.minUrl}" target="_blank" title="${b.stats.minName}" style="color:inherit;text-decoration:underline;text-decoration-style:dotted">${fmt(b.stats.min)}원</a>` : `${fmt(b.stats.min)}원`;
+        const maxLink = b.stats.maxUrl ? `<a href="${b.stats.maxUrl}" target="_blank" title="${b.stats.maxName}" style="color:inherit;text-decoration:underline;text-decoration-style:dotted">${fmt(b.stats.max)}원</a>` : `${fmt(b.stats.max)}원`;
         html += `<tr><td style="font-weight:600;text-align:left">${i===0?cat:''}</td>`;
         html += `<td style="color:${b.color};font-weight:600">${b.name}</td>`;
-        html += `<td style="${isMinPrice?'background:#e8f5e9;font-weight:700':''}">${fmt(b.stats.min)}원</td>`;
+        html += `<td style="${isMinPrice?'background:#e8f5e9;font-weight:700':''}">${minLink}</td>`;
         html += `<td>${fmt(b.stats.avg)}원</td>`;
-        html += `<td>${fmt(b.stats.max)}원</td>`;
+        html += `<td>${maxLink}</td>`;
         html += `<td>${b.stats.count}</td></tr>`;
       });
       html += '<tr><td colspan="6" style="padding:2px;background:#eee"></td></tr>';
