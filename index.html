@@ -1147,6 +1147,13 @@ function filterNDTable(tableId, cat, el) {
 showTop10('down-week', document.querySelector('#top10Pills .pill.active'));
 
 // ===== EXCEL DOWNLOAD =====
+function careTabUrl(url) {
+  if(!url) return '';
+  if(!url.includes('care-solutions')) return url;
+  if(url.includes('dpType=careTab')) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'dpType=careTab';
+}
+
 function downloadExcel() {
   if(typeof XLSX === 'undefined') { alert('SheetJS 라이브러리 로딩 중입니다. 잠시 후 다시 시도하세요.'); return; }
 
@@ -1161,20 +1168,20 @@ function downloadExcel() {
     c.cat, c.name, c.model, c.sku, c.plan, c.term,
     c.w09Price, c.prevPrice, c.currPrice,
     c.weekDiff, c.weekPct, c.w09Diff, c.w09Pct,
-    c.after13, c.promo, c.subOnly ? 'Y' : 'N', c.url
+    c.after13, c.promo, c.subOnly ? 'Y' : 'N', careTabUrl(c.url)
   ]);
   const ws1 = XLSX.utils.aoa_to_sheet([changeHeaders, ...changeData]);
   XLSX.utils.book_append_sheet(wb, ws1, '가격변동');
 
   // Sheet 2: 신규모델
   const newHeaders = ['카테고리','제품명','모델명','케어플랜','계약기간','월구독료','제품URL'];
-  const newData = newModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.price, m.url]);
+  const newData = newModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.price, careTabUrl(m.url)]);
   const ws2 = XLSX.utils.aoa_to_sheet([newHeaders, ...newData]);
   XLSX.utils.book_append_sheet(wb, ws2, '신규모델');
 
   // Sheet 3: 단종모델
   const discHeaders = ['카테고리','제품명','모델명','케어플랜','계약기간','마지막월구독료','제품URL'];
-  const discData = discModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.lastPrice, m.url]);
+  const discData = discModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.lastPrice, careTabUrl(m.url)]);
   const ws3 = XLSX.utils.aoa_to_sheet([discHeaders, ...discData]);
   XLSX.utils.book_append_sheet(wb, ws3, '단종모델');
 
