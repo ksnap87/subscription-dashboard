@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>W12 경쟁사 구독 전략 대시보드</title>
+<title>경쟁사 구독 전략 대시보드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -610,9 +610,9 @@ function linkCell(url) {
     // dpType=careTab 파라미터 추가 → 구독 탭으로 바로 이동
     const sep = url.includes('?') ? '&' : '?';
     const careUrl = url.includes('dpType=careTab') ? url : url + sep + 'dpType=careTab';
-    return `<a href="${careUrl}" target="_blank" class="prod-link">구독상품 ↗</a>`;
+    return `<a href="${careUrl}" target="_blank" class="prod-link">URL ↗</a>`;
   }
-  return `<a href="${url}" target="_blank" class="prod-link">제품정보 ↗</a>`;
+  return `<a href="${url}" target="_blank" class="prod-link">URL ↗</a>`;
 }
 
 // ===== TAB SWITCHING =====
