@@ -606,9 +606,11 @@ function diffStr(n) { if(n==null) return '<span style="color:#999">-</span>'; co
 function pctStr(n) { if(n==null) return '<span style="color:#999">-</span>'; const cls=n>0?'up':n<0?'down':''; const sign=n>0?'+':''; return `<span class="${cls}">${sign}${n}%</span>`; }
 function linkCell(url) {
   if(!url) return '-';
-  // care-solutions URL이면 구독 페이지로 확인됨
   if(url.includes('care-solutions')) {
-    return `<a href="${url}" target="_blank" class="prod-link" title="구독 정보는 페이지 중간에 표시됩니다">구독상품 ↗</a>`;
+    // dpType=careTab 파라미터 추가 → 구독 탭으로 바로 이동
+    const sep = url.includes('?') ? '&' : '?';
+    const careUrl = url.includes('dpType=careTab') ? url : url + sep + 'dpType=careTab';
+    return `<a href="${careUrl}" target="_blank" class="prod-link">구독상품 ↗</a>`;
   }
   return `<a href="${url}" target="_blank" class="prod-link">제품정보 ↗</a>`;
 }
