@@ -382,7 +382,7 @@ a.prod-link:hover { text-decoration: underline; }
 
   <div class="chart-grid">
     <div class="card">
-      <div class="card-title">카테고리별 평균 인하/인상 금액</div>
+      <div class="card-title">카테고리별 평균 인하/인상 금액 <span style="font-size:11px;color:#888;font-weight:400">※ 평균 = 해당 카테고리 내 인하(또는 인상) SKU들의 월구독료 변동액 합계 ÷ 인하(또는 인상) SKU 수</span></div>
       <div class="chart-container"><canvas id="chartAvgChange"></canvas></div>
     </div>
     <div class="card">
@@ -604,7 +604,14 @@ function sortByCatOrder(cats) {
 function fmt(n) { return n != null ? Number(n).toLocaleString() : '-'; }
 function diffStr(n) { if(n==null) return '<span style="color:#999">-</span>'; const cls=n>0?'up':n<0?'down':''; const sign=n>0?'+':''; return `<span class="${cls}">${sign}${fmt(n)}원</span>`; }
 function pctStr(n) { if(n==null) return '<span style="color:#999">-</span>'; const cls=n>0?'up':n<0?'down':''; const sign=n>0?'+':''; return `<span class="${cls}">${sign}${n}%</span>`; }
-function linkCell(url) { return url ? `<a href="${url}" target="_blank" class="prod-link">LG.com ↗</a>` : '-'; }
+function linkCell(url) {
+  if(!url) return '-';
+  // care-solutions URL이면 구독 페이지로 확인됨
+  if(url.includes('care-solutions')) {
+    return `<a href="${url}" target="_blank" class="prod-link" title="구독 정보는 페이지 중간에 표시됩니다">구독상품 ↗</a>`;
+  }
+  return `<a href="${url}" target="_blank" class="prod-link">제품정보 ↗</a>`;
+}
 
 // ===== TAB SWITCHING =====
 function showSection(name, el) {
