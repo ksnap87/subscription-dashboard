@@ -1007,7 +1007,7 @@ function filterNDTable(tableId, cat, el) {
   // Sub-only
   const stb = document.getElementById('subOnlyTable');
   subOnlyModels.forEach((m,i) => {
-    stb.innerHTML += `<tr><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td>${m.plan}</td><td>${m.term}</td><td>${fmt(m.price)}원</td><td>${m.total?fmt(m.total)+'원':'-'}</td><td>${linkCell(m.url)}</td></tr>`;
+    stb.innerHTML += `<tr><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model||''}</td><td>${m.plan}</td><td>${m.term}</td><td>${fmt(m.price)}원</td><td>${m.total?fmt(m.total)+'원':'-'}</td><td><span class="tag tag-sub">구독전용</span></td><td>${linkCell(m.url)}</td></tr>`;
   });
   // 닷컴ONLY
   const dotcomTb = document.getElementById('dotcomOnlyTable');
