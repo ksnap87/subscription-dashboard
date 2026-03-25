@@ -1073,21 +1073,53 @@ function filterNDTable(tableId, cat, el) {
   const topUp = catData.filter(d => d.up > d.down * 2).slice(0, 2);
 
   let insights = [];
+
+  // 1. LG 가격 변동 요약
+  const totalChanges = allChanges.length;
+  const totalDown = allChanges.filter(c => c.weekDiff < 0).length;
+  const totalUp = allChanges.filter(c => c.weekDiff > 0).length;
+  if(totalChanges > 0) {
+    insights.push(`<strong>LG 가격 변동 ${totalChanges}건:</strong> 인하 ${totalDown}건, 인상 ${totalUp}건. ${totalDown > totalUp ? '인하 기조 유지 — 구독 유입 확대 목적.' : '인상 기조 전환 — 수익성 개선 시그널.'}`);
+  }
+
+  // 2. 인하/인상 주요 카테고리
   if(topDown.length > 0) {
-    insights.push(`<strong>대폭 인하 카테고리:</strong> ${topDown.map(d => d.cat + '(' + d.down + '건, 평균 -' + fmt(d.avgDown) + '원)').join(', ')} — 봄 시즌 구독 유입 목표 품목 공격적 인하.`);
+    insights.push(`<strong>주요 인하:</strong> ${topDown.map(d => d.cat + '(' + d.down + '건, 평균 -' + fmt(d.avgDown) + '원)').join(', ')}`);
   }
   if(topUp.length > 0) {
-    insights.push(`<strong>인상 카테고리:</strong> ${topUp.map(d => d.cat + '(' + d.up + '건, 평균 +' + fmt(d.avgUp) + '원)').join(', ')} — 수요 확대 품목 가격 인상.`);
+    insights.push(`<strong>주요 인상:</strong> ${topUp.map(d => d.cat + '(' + d.up + '건, 평균 +' + fmt(d.avgUp) + '원)').join(', ')}`);
   }
-  if(subOnlyModels.length > 0) {
-    const subCats = {};
-    subOnlyModels.forEach(m => { subCats[m.cat] = (subCats[m.cat]||0) + 1; });
-    const topSubCats = Object.entries(subCats).sort((a,b) => b[1]-a[1]).slice(0, 3);
-    insights.push(`<strong>구독전용 모델 ${subOnlyModels.length}개:</strong> ${topSubCats.map(([c,n]) => c+'('+n+'개)').join(', ')} 등 일시불 불가 — 구독 고정 전략.`);
+
+  // 3. 4사 가격 경쟁력 비교 (정수기/공기청정기)
+  if(typeof samsungData !== 'undefined' && typeof cowayData !== 'undefined') {
+    const lgWP = lgCurrentPrices.filter(d => d.cat === '정수기');
+    const samWP = samsungData.filter(d => d.cat === '정수기' && Number(d.price) > 0);
+    const cwWP = cowayData.filter(d => d.cat === '정수기' && Number(d.price) > 0);
+    if(lgWP.length && samWP.length && cwWP.length) {
+      const lgMin = Math.min(...lgWP.map(d => d.price));
+      const samMin = Math.min(...samWP.map(d => Number(d.price)));
+      const cwMin = Math.min(...cwWP.map(d => Number(d.price)));
+      const cheapest = lgMin <= samMin && lgMin <= cwMin ? 'LG' : (cwMin <= samMin ? '코웨이' : '삼성');
+      insights.push(`<strong>정수기 최저가 경쟁:</strong> LG ${fmt(lgMin)}원 vs 삼성 ${fmt(samMin)}원 vs 코웨이 ${fmt(cwMin)}원 — ${cheapest} 최저가.`);
+    }
   }
-  insights.push(`<strong>프로모션 vs 실제 가격:</strong> 전체 ${allChanges.length}건 중 프로모션 가격 변동 0건, 실제 기본 구독료 변동 53건. 13회차 이후 구독료 기준으로 실질 인하 여부 확인 필요.`);
-  insights.push('<strong>코웨이 페스타 진행 중 (3~4월):</strong> 렌탈료 50% 할인, 3대 이상 패키지 시 추가 5개월 반값. 정수기/공기청정기 카테고리 삼성 대응 필요.');
-  insights.push('<strong>SK매직 환승 리워드:</strong> 타사 교체 시 네이버페이 최대 30만P. 삼성 기존 고객 이탈 방어 시급.');
+
+  // 4. 닷컴ONLY + 구독전용
+  if(dotcomOnlyModels.length > 0) {
+    insights.push(`<strong>LG닷컴 ONLY ${dotcomOnlyModels.length}개 모델:</strong> 오프라인 베스타샵 미판매, 온라인 전용 구독 제품. 삼성 온라인 전용 라인업 대비 검토 필요.`);
+  }
+
+  // 5. 신규/단종 동향
+  if(newModels.length > 0 || discModels.length > 0) {
+    const newCats = [...new Set(newModels.map(m => m.cat))].join(', ');
+    const discCats = [...new Set(discModels.map(m => m.cat))].join(', ');
+    let msg = `<strong>라인업 변동:</strong> 신규 ${newModels.length}개`;
+    if(newCats) msg += ` (${newCats})`;
+    msg += `, 단종 ${discModels.length}개`;
+    if(discCats) msg += ` (${discCats})`;
+    msg += '.';
+    insights.push(msg);
+  }
 
   insights.forEach(text => {
     il.innerHTML += `<li>${text}</li>`;
