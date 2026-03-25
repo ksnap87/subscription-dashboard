@@ -1217,13 +1217,17 @@ function filterNDTable(tableId, cat, el) {
   insights.push(compInsight);
 
   // ── 기본 5: 4사 가격 포지셔닝 ──
-  // 삼성이 최저가인 카테고리 vs 경쟁사가 더 싼 카테고리
+  // 인라인으로 삼성/LG 평균가 계산 (samStats가 아직 정의 안 되어 있으므로)
+  const _samByC = {}, _lgByC = {};
+  samsungData.forEach(d => { const p = Number(d.price); if(p > 0) { if(!_samByC[d.cat]) _samByC[d.cat] = []; _samByC[d.cat].push(p); } });
+  lgCurrentPrices.forEach(d => { const p = Number(d.price); if(p > 0) { if(!_lgByC[d.cat]) _lgByC[d.cat] = []; _lgByC[d.cat].push(p); } });
   const samCheaper = [];
   const samExpensive = [];
-  Object.keys(samStats).forEach(cat => {
-    const samAvg = samStats[cat]?.avg || 0;
-    const lgAvg = lgStats[cat]?.avg || 0;
-    if(samAvg && lgAvg) {
+  Object.keys(_samByC).forEach(cat => {
+    const samAvg = _samByC[cat].reduce((a,b)=>a+b,0) / _samByC[cat].length;
+    const lgPrices = _lgByC[cat];
+    if(lgPrices && lgPrices.length > 0) {
+      const lgAvg = lgPrices.reduce((a,b)=>a+b,0) / lgPrices.length;
       if(samAvg < lgAvg) samCheaper.push(cat);
       else if(samAvg > lgAvg) samExpensive.push(cat);
     }
