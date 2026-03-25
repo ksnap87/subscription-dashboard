@@ -1019,14 +1019,24 @@ function filterNDTable(tableId, cat, el) {
       dotcomTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan}</td><td>${m.term}</td><td>${fmt(m.price)}원</td><td>${linkCell(m.url)}</td></tr>`;
     });
   }
-  // 반값할인 모델 전체 (닷컴ONLY 여부 표시)
+  // 반값할인 모델 전체 (닷컴ONLY 여부 표시 + 카테고리 필터)
   const hptb = document.getElementById('halfPriceTable');
-  if(hptb) {
+  if(hptb && halfPriceModels.length > 0) {
+    const halfCats = sortByCatOrder([...new Set(halfPriceModels.map(m=>m.cat))]);
+    let halfFilt = '<div class="filter-pills" style="margin-bottom:12px">';
+    halfFilt += `<button class="pill active" onclick="filterNDTable('halfPriceTable',null,this)">전체</button>`;
+    halfCats.forEach(cat => {
+      const cnt = halfPriceModels.filter(m=>m.cat===cat).length;
+      halfFilt += `<button class="pill" onclick="filterNDTable('halfPriceTable','${cat}',this)">${cat} (${cnt})</button>`;
+    });
+    halfFilt += '</div>';
+    document.getElementById('halfPriceDetail').insertAdjacentHTML('afterbegin', halfFilt);
+
     const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
     halfPriceModels.forEach((m,i) => {
       const isDotcom = dotcomSet.has(m.model);
       const dotcomBadge = isDotcom ? '<span style="background:#a50034;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">ONLY</span>' : '';
-      hptb.innerHTML += `<tr><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${dotcomBadge}</td><td>${linkCell(m.url)}</td></tr>`;
+      hptb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${dotcomBadge}</td><td>${linkCell(m.url)}</td></tr>`;
     });
   }
   // 닷컴ONLY 전체 리스트 (카테고리 필터)
