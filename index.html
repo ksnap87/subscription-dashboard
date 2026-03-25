@@ -1450,39 +1450,36 @@ function filterNDTable(tableId, cat, el) {
     insightsHtml += '</div>';
     insightsHtml += '</div>';
 
-    // 2. 삼성이 제품이 적은 카테고리 (기회 gap)
-    const allBrandCats = new Set([...Object.keys(lgStats), ...Object.keys(cowayStats), ...Object.keys(skStats), ...Object.keys(samStats)]);
-    const opportunityGaps = [];
+    // 2. 삼성 전체 카테고리 라인업 (경쟁사 대비)
+    const allBrandCats = new Set([...Object.keys(samStats), ...Object.keys(lgStats), ...Object.keys(cowayStats), ...Object.keys(skStats)]);
+    const allCatRows = [];
     allBrandCats.forEach(cat => {
       const samCount = samStats[cat]?.count || 0;
-      const otherMax = Math.max(lgStats[cat]?.count || 0, cowayStats[cat]?.count || 0, skStats[cat]?.count || 0);
-      if(otherMax > 0 && samCount < otherMax) {
-        const otherBrands = [];
-        if(lgStats[cat]) otherBrands.push({brand:'LG', count:lgStats[cat].count});
-        if(cowayStats[cat]) otherBrands.push({brand:'코웨이', count:cowayStats[cat].count});
-        if(skStats[cat]) otherBrands.push({brand:'SK매직', count:skStats[cat].count});
-        opportunityGaps.push({ cat, samCount, otherMax, gap: otherMax - samCount, otherBrands });
-      }
+      const lgCount = lgStats[cat]?.count || 0;
+      const cowayCount = cowayStats[cat]?.count || 0;
+      const skCount = skStats[cat]?.count || 0;
+      allCatRows.push({ cat, samCount, lgCount, cowayCount, skCount });
     });
-    opportunityGaps.sort((a,b) => b.gap - a.gap);
+    // 삼성 제품수 많은 순 정렬, 삼성 없으면 뒤로
+    allCatRows.sort((a,b) => (b.samCount || -999) - (a.samCount || -999));
 
     insightsHtml += '<div style="background:#fff8e1;border-radius:8px;padding:16px;border-left:4px solid #f39c12;margin-bottom:20px">';
-    insightsHtml += '<h4 style="margin:0 0 12px;font-size:14px;color:#e67e22">삼성 제품 라인업 갭 (경쟁사 대비 제품수 부족)</h4>';
-    if(opportunityGaps.length > 0) {
-      insightsHtml += '<div class="table-wrap"><table><thead><tr><th>카테고리</th><th>삼성 제품수</th>';
-      insightsHtml += '<th>LG</th><th>코웨이</th><th>SK매직</th><th>최대 차이</th></tr></thead><tbody>';
-      opportunityGaps.slice(0, 8).forEach(item => {
-        insightsHtml += `<tr><td style="font-weight:600;text-align:left">${item.cat}</td>`;
-        insightsHtml += `<td style="color:#4169E1;font-weight:600">${item.samCount || '-'}</td>`;
-        insightsHtml += `<td>${lgStats[item.cat]?.count || '-'}</td>`;
-        insightsHtml += `<td>${cowayStats[item.cat]?.count || '-'}</td>`;
-        insightsHtml += `<td>${skStats[item.cat]?.count || '-'}</td>`;
-        insightsHtml += `<td style="color:#e74c3c;font-weight:600">-${item.gap}</td></tr>`;
-      });
-      insightsHtml += '</tbody></table></div>';
-    } else {
-      insightsHtml += '<p style="color:#999;font-size:13px">라인업 갭 없음</p>';
-    }
+    insightsHtml += '<h4 style="margin:0 0 12px;font-size:14px;color:#e67e22">4사 제품 라인업 현황</h4>';
+    insightsHtml += '<p style="font-size:12px;color:#888;margin:0 0 8px">💡 삼성 구독 라인업 기준으로 경쟁사 제품수를 비교합니다.</p>';
+    insightsHtml += '<div class="table-wrap"><table><thead><tr><th>카테고리</th><th style="color:#4169E1">삼성</th>';
+    insightsHtml += '<th style="color:#a50034">LG</th><th style="color:#00a5b5">코웨이</th><th style="color:#e67e22">SK매직</th></tr></thead><tbody>';
+    allCatRows.forEach(item => {
+      const samCell = item.samCount ? `<b>${item.samCount}</b>` : '<span style="color:#ccc">-</span>';
+      const lgCell = item.lgCount ? `${item.lgCount}` : '<span style="color:#ccc">-</span>';
+      const cowayCell = item.cowayCount ? `${item.cowayCount}` : '<span style="color:#ccc">-</span>';
+      const skCell = item.skCount ? `${item.skCount}` : '<span style="color:#ccc">-</span>';
+      insightsHtml += `<tr><td style="font-weight:600;text-align:left">${item.cat}</td>`;
+      insightsHtml += `<td style="color:#4169E1">${samCell}</td>`;
+      insightsHtml += `<td>${lgCell}</td>`;
+      insightsHtml += `<td>${cowayCell}</td>`;
+      insightsHtml += `<td>${skCell}</td></tr>`;
+    });
+    insightsHtml += '</tbody></table></div>';
     insightsHtml += '</div>';
 
     // 3. 경쟁사별 평균 가격 차이 요약
