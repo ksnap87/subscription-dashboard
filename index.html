@@ -507,12 +507,6 @@ a.prod-link:hover { text-decoration: underline; }
       </div>
     </div>
   </div>
-  <!-- 스크린샷 모달 -->
-  <div id="screenshotModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;cursor:pointer;padding:40px" onclick="this.style.display='none'">
-    <div style="text-align:center;color:white;font-size:16px;font-weight:600;margin-bottom:12px" id="screenshotTitle"></div>
-    <img id="screenshotImg" style="max-width:90%;max-height:85vh;margin:auto;display:block;border-radius:8px">
-    <div style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;margin-top:12px">클릭하면 닫힙니다</div>
-  </div>
   <div class="comp-grid" id="compGrid"></div>
   <div class="card">
     <div class="card-title">카테고리별 프로모션 비교 매트릭스</div>
@@ -567,9 +561,18 @@ a.prod-link:hover { text-decoration: underline; }
     <div style="background:#fff3cd;border-radius:8px;padding:16px;margin-bottom:20px">
       <strong style="color:#856404">핵심 원인 3가지</strong>
       <ol style="margin:8px 0 0 20px;color:#856404;font-size:13px;line-height:1.8">
-        <li><strong>코웨이페스타</strong> (3/3~4/28): 연중 최대 프로모션으로 신규 가입 수요 흡수 — 최대 15개월 렌탈료 50% 할인 <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/coway_festa_pr.png','코웨이페스타 보도자료')" style="color:#e67e22;font-size:11px">[근거↗]</a></li>
-        <li><strong>LG 공격적 가격인하</strong>: 환경가전 중심 810개 SKU 구조적 가격 재편 — 평균 -4,144원/월 <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/lg_main_promo.png','LG 케어솔루션 메인')" style="color:#e67e22;font-size:11px">[근거↗]</a></li>
-        <li><strong>SK매직 환승 리워드</strong>: 타사 고객 직접 탈취 프로그램 — 네이버페이 최대 30만P <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/skmagic_events.png','SK매직 이벤트')" style="color:#e67e22;font-size:11px">[근거↗]</a></li>
+        <li><strong>코웨이페스타</strong> (3/3~4/28): 연중 최대 프로모션으로 신규 가입 수요 흡수 — 최대 15개월 렌탈료 50% 할인
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/coway_festa_pr.png','코웨이페스타 공식 보도자료')" style="color:#e67e22;font-size:11px">[스크린샷↗]</a>
+          <a href="https://company.coway.com/newsroom/press/924" target="_blank" style="color:#2196F3;font-size:11px">[보도자료↗]</a>
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/coway_festa_list.png','코웨이 이벤트 목록')" style="color:#e67e22;font-size:11px">[이벤트목록↗]</a></li>
+        <li><strong>LG 공격적 가격인하</strong>: 환경가전 중심 810개 SKU 구조적 가격 재편 — 평균 -4,144원/월
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/lg_main_promo.png','LG 케어솔루션 메인 캠페인')" style="color:#e67e22;font-size:11px">[스크린샷↗]</a>
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/lg_water_purifier_50off.png','LG 정수기 12개월 반값')" style="color:#e67e22;font-size:11px">[정수기반값↗]</a>
+          <a href="javascript:void(0)" onclick="showSection('summary',document.querySelector('.tab:first-child'));document.getElementById('threatTable').scrollIntoView()" style="color:#2196F3;font-size:11px">[영향도분석↗]</a></li>
+        <li><strong>SK매직 환승 리워드</strong>: 타사 고객 직접 탈취 프로그램 — 네이버페이 최대 30만P
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/skmagic_events.png','SK매직 이벤트 목록')" style="color:#e67e22;font-size:11px">[스크린샷↗]</a>
+          <a href="javascript:void(0)" onclick="openScreenshot('screenshots/evidence/skmagic_main.png','SK매직 메인 정수기 구독가')" style="color:#e67e22;font-size:11px">[메인페이지↗]</a>
+          <a href="https://www.skmagic.com/event/indexEvent" target="_blank" style="color:#2196F3;font-size:11px">[이벤트페이지↗]</a></li>
       </ol>
     </div>
   </div>
@@ -631,6 +634,13 @@ a.prod-link:hover { text-decoration: underline; }
 </div>
 
 </div><!-- /container -->
+
+<!-- 스크린샷 모달 (container 바깥 — 모든 탭에서 접근 가능) -->
+<div id="screenshotModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;cursor:pointer;padding:40px" onclick="this.style.display='none'">
+  <div style="text-align:center;color:white;font-size:16px;font-weight:600;margin-bottom:12px" id="screenshotTitle"></div>
+  <img id="screenshotImg" style="max-width:90%;max-height:85vh;margin:auto;display:block;border-radius:8px">
+  <div style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;margin-top:12px">클릭하면 닫힙니다</div>
+</div>
 
 <script>
 // ===== EMBEDDED DATA =====
