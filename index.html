@@ -62,11 +62,11 @@ body {
 .btn-excel:hover { background: rgba(255,255,255,0.25); }
 .tabs {
   display: flex;
-  gap: 0;
+  flex-wrap: wrap;
+  gap: 4px;
   background: rgba(255,255,255,0.08);
   border-radius: 8px;
   margin-top: 16px;
-  overflow-x: auto;
   width: fit-content;
   max-width: 100%;
 }
@@ -322,7 +322,7 @@ a.prod-link:hover { text-decoration: underline; }
   .header { padding: 16px; }
   .header h1 { font-size: 18px; }
   .container { padding: 12px; }
-  .tabs { overflow-x: auto; }
+  .tabs { flex-wrap: wrap; }
   .header-top { flex-direction: column; gap: 12px; }
 }
 </style>
@@ -547,7 +547,7 @@ a.prod-link:hover { text-decoration: underline; }
       <table style="width:100%;font-size:13px;border-collapse:collapse">
         <tr style="background:#f8f9fa"><th style="text-align:left;padding:6px 8px;font-weight:600">브랜드</th><th style="text-align:left;padding:6px 8px">환승/결합 혜택</th></tr>
         <tr style="border-bottom:1px solid #eee"><td style="padding:6px 8px;color:#4169E1;font-weight:600">삼성</td><td style="padding:6px 8px">이사 시 <b>재설치 무료</b> (에어컨/정수기/TV70"+, 1회)</td></tr>
-        <tr style="border-bottom:1px solid #eee"><td style="padding:6px 8px;color:#a50034;font-weight:600">LG</td><td style="padding:6px 8px"><b>철거/재설치 무료</b> (워시타워/에어컨/70인치TV) · 2품목 10만P, 3품목+ 20만P</td></tr>
+        <tr style="border-bottom:1px solid #eee"><td style="padding:6px 8px;color:#a50034;font-weight:600">LG</td><td style="padding:6px 8px"><b>철거/재설치 무료</b> (세탁기/에어컨/70인치TV) · 2품목 10만P, 3품목+ 20만P</td></tr>
         <tr style="border-bottom:1px solid #eee"><td style="padding:6px 8px;color:#00a5b5;font-weight:600">코웨이</td><td style="padding:6px 8px">타사 보상 <b>10% + 월 1만×12개월</b> · 2대+ 패키지 <b>15%</b></td></tr>
         <tr><td style="padding:6px 8px;color:#e67e22;font-weight:600">SK매직</td><td style="padding:6px 8px">환승리워드 타사보상 · 패키지+지인추천</td></tr>
       </table>
@@ -706,7 +706,7 @@ const CURR_WEEK = 'W12';
 const PREV_WEEK = 'W11';
 const W09_WEEK = 'W09';
 
-const CAT_ORDER = ['정수기','냉장고','세탁기','건조기','의류건조기','워시타워','워시콤보','의류관리기','청소기','에어컨','시스템에어컨','공기청정기','TV','식기세척기','전기레인지','김치냉장고','노트북','광파오븐전자레인지','가습기','제습기','바스에어시스템','매트리스','안마의자','비데'];
+const CAT_ORDER = ['정수기','냉장고','세탁기','건조기','의류청정기','청소기','에어컨','시스템에어컨','공기청정기','TV','식기세척기','전기레인지','김치냉장고','노트북','광파오븐전자레인지','가습기','제습기','바스에어시스템','태블릿','모니터','사운드바','후드'];
 function sortByCatOrder(cats) {
   return cats.sort((a,b) => {
     const ia = CAT_ORDER.indexOf(a); const ib = CAT_ORDER.indexOf(b);
