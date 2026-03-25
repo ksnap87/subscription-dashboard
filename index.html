@@ -416,32 +416,27 @@ a.prod-link:hover { text-decoration: underline; }
   </div>
 
   <div class="card" style="border-left:4px solid #a50034">
-    <div class="card-title" style="cursor:pointer" onclick="document.getElementById('halfPriceDetail').style.display=document.getElementById('halfPriceDetail').style.display==='none'?'block':'none'">
-      🔴 LG닷컴 ONLY · 12개월 반값할인 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
+    <div class="card-title" style="cursor:pointer" onclick="document.getElementById('dotcomDetail').style.display=document.getElementById('dotcomDetail').style.display==='none'?'block':'none'">
+      🔴 LG닷컴 ONLY — 33개 모델 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
-      <div style="background:#f8f0f3;border-radius:8px;padding:16px;text-align:center">
-        <div style="font-size:12px;color:#a50034;font-weight:500">닷컴ONLY 모델</div>
-        <div style="font-size:28px;font-weight:700;color:#a50034;margin-top:4px">33<span style="font-size:14px;font-weight:400;color:#666">개</span></div>
-      </div>
-      <div style="background:#f8f0f3;border-radius:8px;padding:16px;text-align:center">
-        <div style="font-size:12px;color:#a50034;font-weight:500">12개월 반값할인</div>
-        <div style="font-size:28px;font-weight:700;color:#a50034;margin-top:4px">9<span style="font-size:14px;font-weight:400;color:#666">개</span></div>
-      </div>
-    </div>
-    <div id="halfPriceDetail" style="display:none">
-      <div class="card-title" style="font-size:13px;margin-bottom:8px">12개월 반값할인 모델 (9개)</div>
-      <div class="table-wrap" style="max-height:300px;overflow-y:auto;margin-bottom:16px">
-        <table>
-          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>닷컴ONLY</th><th>URL</th></tr></thead>
-          <tbody id="halfPriceTable"></tbody>
-        </table>
-      </div>
-      <div class="card-title" style="font-size:13px;margin-bottom:8px">닷컴ONLY 전체 (33개)</div>
-      <div class="table-wrap" style="max-height:400px;overflow-y:auto">
+    <div id="dotcomDetail" style="display:none">
+      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
         <table>
           <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>URL</th></tr></thead>
           <tbody id="dotcomListTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border-left:4px solid #e67e22">
+    <div class="card-title" style="cursor:pointer" onclick="document.getElementById('halfPriceDetail').style.display=document.getElementById('halfPriceDetail').style.display==='none'?'block':'none'">
+      🟠 12개월 반값할인 — 9개 모델 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
+    </div>
+    <div id="halfPriceDetail" style="display:none">
+      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+        <table>
+          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>닷컴ONLY</th><th>URL</th></tr></thead>
+          <tbody id="halfPriceTable"></tbody>
         </table>
       </div>
     </div>
