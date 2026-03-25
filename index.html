@@ -1218,7 +1218,7 @@ function filterNDTable(tableId, cat, el) {
 // ===== LG PRICE REFORM TABLE (Tab 5) =====
 (function() {
   const wrap = document.getElementById('lgPriceReform');
-  const topCats = catData.filter(d => d.down > 20).sort((a,b) => b.down - a.down).slice(0, 6);
+  const topCats = catData.filter(d => d.down > 0).sort((a,b) => b.down - a.down).slice(0, 8);
   let html = '<table><thead><tr><th>카테고리</th><th>인하 SKU</th><th>평균 인하액</th></tr></thead><tbody>';
   topCats.forEach(d => {
     html += `<tr><td style="text-align:left;font-weight:600">${d.cat}</td><td><span class="tag tag-down">${d.down}개</span></td><td style="text-align:left">평균 -${fmt(d.avgDown)}원/월</td></tr>`;
