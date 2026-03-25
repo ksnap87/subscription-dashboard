@@ -1113,7 +1113,7 @@ function filterNDTable(tableId, cat, el) {
   // ── 기본 4: 경쟁사 프로모션 전략 ──
   let compInsight = '<strong>경쟁사 프로모션 전략:</strong> ';
   const compSummaries = [];
-  competitors.forEach(comp => {
+  Object.values(competitors).forEach(comp => {
     if(comp.benefits && comp.benefits.length > 0) {
       const topBenefit = comp.benefits[0].text.substring(0, 40);
       compSummaries.push(comp.name + ' — ' + topBenefit);
