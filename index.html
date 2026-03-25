@@ -1073,52 +1073,64 @@ function filterNDTable(tableId, cat, el) {
   const topUp = catData.filter(d => d.up > d.down * 2).slice(0, 2);
 
   let insights = [];
-
-  // 1. LG 가격 변동 요약
   const totalChanges = allChanges.length;
   const totalDown = allChanges.filter(c => c.weekDiff < 0).length;
   const totalUp = allChanges.filter(c => c.weekDiff > 0).length;
-  if(totalChanges > 0) {
-    insights.push(`<strong>LG 가격 변동 ${totalChanges}건:</strong> 인하 ${totalDown}건, 인상 ${totalUp}건. ${totalDown > totalUp ? '인하 기조 유지 — 구독 유입 확대 목적.' : '인상 기조 전환 — 수익성 개선 시그널.'}`);
+
+  // ── 기본 1: 인상 카테고리 ──
+  const upCats = catData.filter(d => d.up > 0).sort((a,b) => b.up - a.up);
+  if(upCats.length > 0) {
+    insights.push(`<strong>인상 카테고리 (${totalUp}건):</strong> ${upCats.slice(0,5).map(d => d.cat + ' ' + d.up + '건(평균 +' + fmt(d.avgUp) + '원)').join(', ')}`);
+  } else {
+    insights.push(`<strong>인상 카테고리:</strong> 이번 주 인상 없음.`);
   }
 
-  // 2. 인하/인상 주요 카테고리
-  if(topDown.length > 0) {
-    insights.push(`<strong>주요 인하:</strong> ${topDown.map(d => d.cat + '(' + d.down + '건, 평균 -' + fmt(d.avgDown) + '원)').join(', ')}`);
-  }
-  if(topUp.length > 0) {
-    insights.push(`<strong>주요 인상:</strong> ${topUp.map(d => d.cat + '(' + d.up + '건, 평균 +' + fmt(d.avgUp) + '원)').join(', ')}`);
-  }
-
-  // 3. 4사 가격 경쟁력 비교 (정수기/공기청정기)
-  if(typeof samsungData !== 'undefined' && typeof cowayData !== 'undefined') {
-    const lgWP = lgCurrentPrices.filter(d => d.cat === '정수기');
-    const samWP = samsungData.filter(d => d.cat === '정수기' && Number(d.price) > 0);
-    const cwWP = cowayData.filter(d => d.cat === '정수기' && Number(d.price) > 0);
-    if(lgWP.length && samWP.length && cwWP.length) {
-      const lgMin = Math.min(...lgWP.map(d => d.price));
-      const samMin = Math.min(...samWP.map(d => Number(d.price)));
-      const cwMin = Math.min(...cwWP.map(d => Number(d.price)));
-      const cheapest = lgMin <= samMin && lgMin <= cwMin ? 'LG' : (cwMin <= samMin ? '코웨이' : '삼성');
-      insights.push(`<strong>정수기 최저가 경쟁:</strong> LG ${fmt(lgMin)}원 vs 삼성 ${fmt(samMin)}원 vs 코웨이 ${fmt(cwMin)}원 — ${cheapest} 최저가.`);
-    }
+  // ── 기본 2: 인하 카테고리 ──
+  const downCats = catData.filter(d => d.down > 0).sort((a,b) => b.down - a.down);
+  if(downCats.length > 0) {
+    insights.push(`<strong>인하 카테고리 (${totalDown}건):</strong> ${downCats.slice(0,5).map(d => d.cat + ' ' + d.down + '건(평균 -' + fmt(d.avgDown) + '원)').join(', ')}`);
+  } else {
+    insights.push(`<strong>인하 카테고리:</strong> 이번 주 인하 없음.`);
   }
 
-  // 4. 닷컴ONLY + 구독전용
-  if(dotcomOnlyModels.length > 0) {
-    insights.push(`<strong>LG닷컴 ONLY ${dotcomOnlyModels.length}개 모델:</strong> 오프라인 베스타샵 미판매, 온라인 전용 구독 제품. 삼성 온라인 전용 라인업 대비 검토 필요.`);
-  }
-
-  // 5. 신규/단종 동향
+  // ── 기본 3: 라인업 변동 (신규/단종) ──
   if(newModels.length > 0 || discModels.length > 0) {
-    const newCats = [...new Set(newModels.map(m => m.cat))].join(', ');
-    const discCats = [...new Set(discModels.map(m => m.cat))].join(', ');
+    const newBycat = {};
+    newModels.forEach(m => { newBycat[m.cat] = (newBycat[m.cat]||0) + 1; });
+    const discBycat = {};
+    discModels.forEach(m => { discBycat[m.cat] = (discBycat[m.cat]||0) + 1; });
     let msg = `<strong>라인업 변동:</strong> 신규 ${newModels.length}개`;
-    if(newCats) msg += ` (${newCats})`;
+    const newTop = Object.entries(newBycat).sort((a,b) => b[1]-a[1]).slice(0,3);
+    if(newTop.length) msg += ` (${newTop.map(([c,n]) => c+' '+n+'개').join(', ')})`;
     msg += `, 단종 ${discModels.length}개`;
-    if(discCats) msg += ` (${discCats})`;
-    msg += '.';
+    const discTop = Object.entries(discBycat).sort((a,b) => b[1]-a[1]).slice(0,3);
+    if(discTop.length) msg += ` (${discTop.map(([c,n]) => c+' '+n+'개').join(', ')})`;
     insights.push(msg);
+  } else {
+    insights.push(`<strong>라인업 변동:</strong> 이번 주 신규/단종 없음.`);
+  }
+
+  // ── 기본 4: 경쟁사 프로모션 전략 ──
+  let compInsight = '<strong>경쟁사 프로모션 전략:</strong> ';
+  const compSummaries = [];
+  competitors.forEach(comp => {
+    if(comp.benefits && comp.benefits.length > 0) {
+      const topBenefit = comp.benefits[0].text.substring(0, 40);
+      compSummaries.push(comp.name + ' — ' + topBenefit);
+    }
+  });
+  compInsight += compSummaries.join(' / ');
+  insights.push(compInsight);
+
+  // ── 특별 내용 (해당 주에만 표시) ──
+  // 대폭 인하 (인하 > 인상의 3배 이상인 카테고리)
+  const bigDown = catData.filter(d => d.down > d.up * 3 && d.down >= 5);
+  if(bigDown.length > 0) {
+    insights.push(`<strong>⚡ 주목:</strong> ${bigDown.map(d => d.cat).join(', ')} 대폭 인하 — 공격적 가격 전략 감지.`);
+  }
+  // 닷컴ONLY 변동
+  if(dotcomOnlyModels.length > 0) {
+    insights.push(`<strong>LG닷컴 ONLY ${dotcomOnlyModels.length}개:</strong> 온라인 전용 구독 제품 운영 중.`);
   }
 
   insights.forEach(text => {
