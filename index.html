@@ -417,7 +417,7 @@ a.prod-link:hover { text-decoration: underline; }
 
   <div class="card" style="border-left:4px solid #a50034">
     <div class="card-title" style="cursor:pointer" onclick="document.getElementById('halfPriceDetail').style.display=document.getElementById('halfPriceDetail').style.display==='none'?'block':'none'">
-      🔴 LG닷컴 ONLY 현황 — 33개 모델 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기) · 12개월 반값할인 9개 포함</span>
+      🔴 LG닷컴 ONLY — 33개 모델 + 12개월 반값할인 9개 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
       <div style="background:#f8f0f3;border-radius:8px;padding:16px;text-align:center">
@@ -430,10 +430,18 @@ a.prod-link:hover { text-decoration: underline; }
       </div>
     </div>
     <div id="halfPriceDetail" style="display:none">
-      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+      <div class="card-title" style="font-size:13px;margin-bottom:8px">12개월 반값할인 모델 (9개)</div>
+      <div class="table-wrap" style="max-height:300px;overflow-y:auto;margin-bottom:16px">
         <table>
-          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>반값할인</th><th>URL</th></tr></thead>
+          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>닷컴ONLY</th><th>URL</th></tr></thead>
           <tbody id="halfPriceTable"></tbody>
+        </table>
+      </div>
+      <div class="card-title" style="font-size:13px;margin-bottom:8px">닷컴ONLY 전체 (33개)</div>
+      <div class="table-wrap" style="max-height:400px;overflow-y:auto">
+        <table>
+          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>URL</th></tr></thead>
+          <tbody id="dotcomListTable"></tbody>
         </table>
       </div>
     </div>
@@ -1016,14 +1024,21 @@ function filterNDTable(tableId, cat, el) {
       dotcomTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan}</td><td>${m.term}</td><td>${fmt(m.price)}원</td><td>${linkCell(m.url)}</td></tr>`;
     });
   }
-  // 닷컴ONLY 모델 (반값할인 구분 표시)
+  // 반값할인 모델 전체 (닷컴ONLY 여부 표시)
   const hptb = document.getElementById('halfPriceTable');
-  if(hptb && dotcomOnlyModels.length > 0) {
-    const halfPriceSet = new Set(halfPriceModels.map(m => m.model));
+  if(hptb) {
+    const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
+    halfPriceModels.forEach((m,i) => {
+      const isDotcom = dotcomSet.has(m.model);
+      const dotcomBadge = isDotcom ? '<span style="background:#a50034;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">ONLY</span>' : '';
+      hptb.innerHTML += `<tr><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${dotcomBadge}</td><td>${linkCell(m.url)}</td></tr>`;
+    });
+  }
+  // 닷컴ONLY 전체 리스트
+  const dotcomListTb = document.getElementById('dotcomListTable');
+  if(dotcomListTb) {
     dotcomOnlyModels.forEach((m,i) => {
-      const isHalf = halfPriceSet.has(m.model);
-      const halfBadge = isHalf ? '<span style="background:#a50034;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">반값</span>' : '';
-      hptb.innerHTML += `<tr style="${isHalf?'background:#fef2f4;':''}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${halfBadge}</td><td>${linkCell(m.url)}</td></tr>`;
+      dotcomListTb.innerHTML += `<tr><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${m.name}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${linkCell(m.url)}</td></tr>`;
     });
   }
 })();
