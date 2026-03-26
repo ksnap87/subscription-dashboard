@@ -422,6 +422,7 @@ a.prod-link:hover { text-decoration: underline; }
     </div>
     <div id="priceHistoryDetail" style="display:none">
       <p style="font-size:12px;color:#666;margin:0 0 8px">W09부터 현재까지 같은 모델의 구독료 변동을 추적합니다. 가격이 한 번이라도 변한 모델만 표시합니다.</p>
+      <div id="priceHistoryFilters"></div>
       <div class="table-wrap" style="max-height:600px;overflow-y:auto">
         <table>
           <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>W09</th><th>W11</th><th>W12</th><th>W13</th><th>W09→현재</th><th>URL</th></tr></thead>
@@ -476,6 +477,11 @@ a.prod-link:hover { text-decoration: underline; }
 
 <!-- ==================== TAB 3: 신규·단종 현황 ==================== -->
 <div id="sec-newdisc" class="section">
+  <div class="card">
+    <div class="card-title">신규·단종 요약</div>
+    <p id="newDiscSummaryText" style="font-size:14px;color:#333;margin:0 0 12px;padding:0 4px"></p>
+    <div class="chart-container" style="height:320px"><canvas id="chartNewByCategory"></canvas></div>
+  </div>
   <div class="card">
     <div class="card-title">신규 모델 — 총 180건 (W12→W13)</div>
     <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 이번 주 새로 추가된 구독 모델입니다. 신규 라인업 확대 동향을 파악합니다.</p>
@@ -605,6 +611,11 @@ a.prod-link:hover { text-decoration: underline; }
 
 <!-- ==================== TAB 5: 4사 가격 비교 ==================== -->
 <div id="sec-pricecompare" class="section">
+  <div class="card">
+    <div class="card-title">4사 브랜드별 평균 월구독료 비교 차트</div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 카테고리별로 4사의 평균 월구독료를 한눈에 비교합니다.</p>
+    <div class="chart-container" style="height:400px"><canvas id="chartBrandCompare"></canvas></div>
+  </div>
   <div class="card">
     <div class="card-title">4사 카테고리별 월구독료 비교 <span style="font-size:11px;color:#888;font-weight:400">크롤링 데이터 기반 · 2026-03-26</span></div>
     <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 같은 제품군에서 삼성의 가격 포지셔닝을 확인합니다. 초록 하이라이트가 해당 카테고리 최저가입니다.</p>
@@ -812,9 +823,9 @@ function showKpiDetail(type) {
     html += `<div class="card-title">${label} — 카테고리별 분포</div>`;
     html += '<div style="height:280px;margin-bottom:20px"><canvas id="kpiBreakdownChart"></canvas></div>';
     html += '<div class="filter-pills" style="margin-bottom:12px">';
-    html += `<button class="pill active" onclick="filterKpiTable(null,this)">전체</button>`;
-    sorted.forEach(([cat]) => {
-      html += `<button class="pill" onclick="filterKpiTable('${cat}',this)">${cat}</button>`;
+    html += `<button class="pill active" onclick="filterKpiTable(null,this)">전체 (${items.length})</button>`;
+    sorted.forEach(([cat, cnt]) => {
+      html += `<button class="pill" onclick="filterKpiTable('${cat}',this)">${cat} (${cnt})</button>`;
     });
     html += '</div>';
     return sorted;
@@ -979,7 +990,8 @@ let _top10Mode = 'down-week';
   document.getElementById('catPriceChangeSummary').innerHTML = html;
 
   // 품목별 필터 pills
-  let pillsHtml = `<button class="pill active" onclick="showCatDetail(null,this)">전체</button>`;
+  const totalChanged = allChanges.filter(c => c.weekDiff !== 0).length;
+  let pillsHtml = `<button class="pill active" onclick="showCatDetail(null,this)">전체 (${totalChanged})</button>`;
   cats.forEach(cat => {
     const cnt = allChanges.filter(c => c.cat === cat && c.weekDiff !== 0).length;
     if(cnt > 0) pillsHtml += `<button class="pill" onclick="showCatDetail('${cat}',this)">${cat} (${cnt})</button>`;
@@ -1032,7 +1044,7 @@ function filterNDTable(tableId, cat, el) {
   const newCard = document.getElementById('newTable').closest('.card');
   const newCats = sortByCatOrder([...new Set(newModels.map(m=>m.cat))]);
   let filterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
-  filterHtml += `<button class="pill active" onclick="filterNDTable('newTable',null,this)">전체</button>`;
+  filterHtml += `<button class="pill active" onclick="filterNDTable('newTable',null,this)">전체 (${newModels.length})</button>`;
   newCats.forEach(cat => {
     const cnt = newModels.filter(m=>m.cat===cat).length;
     filterHtml += `<button class="pill" onclick="filterNDTable('newTable','${cat}',this)">${cat} (${cnt})</button>`;
@@ -1048,7 +1060,7 @@ function filterNDTable(tableId, cat, el) {
   const discCard = document.getElementById('discTable').closest('.card');
   const discCats = sortByCatOrder([...new Set(discModels.map(m=>m.cat))]);
   let discFilterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
-  discFilterHtml += `<button class="pill active" onclick="filterNDTable('discTable',null,this)">전체</button>`;
+  discFilterHtml += `<button class="pill active" onclick="filterNDTable('discTable',null,this)">전체 (${discModels.length})</button>`;
   discCats.forEach(cat => {
     const cnt = discModels.filter(m=>m.cat===cat).length;
     discFilterHtml += `<button class="pill" onclick="filterNDTable('discTable','${cat}',this)">${cat} (${cnt})</button>`;
@@ -1077,8 +1089,9 @@ function filterNDTable(tableId, cat, el) {
   document.getElementById('subOnlyFilters').innerHTML = subFilterHtml;
   // ── 모델별 구독료 변동 추적 (W09→현재) ──
   const priceHistoryItems = lgCurrentPrices.filter(m => {
-    if(!m.w09 && !m.w11 && !m.w12) return false;
-    return (m.w09 && m.w09 !== m.price) || (m.w11 && m.w11 !== m.price) || (m.w12 && m.w12 !== m.price);
+    // W09 가격이 있고, W09→현재 가격이 실제로 다른 모델만
+    if(!m.w09) return false;
+    return m.w09 !== m.price;
   }).sort((a,b) => {
     const aDiff = (a.w09 ? a.price - a.w09 : 0);
     const bDiff = (b.w09 ? b.price - b.w09 : 0);
@@ -1089,7 +1102,7 @@ function filterNDTable(tableId, cat, el) {
   priceHistoryItems.forEach((m, i) => {
     const w09to = m.w09 ? m.price - m.w09 : null;
     const diffStr = w09to !== null ? (w09to > 0 ? `<span style="color:#e74c3c">+${fmt(w09to)}원</span>` : w09to < 0 ? `<span style="color:#3498db">${fmt(w09to)}원</span>` : '-') : '-';
-    pht.innerHTML += `<tr>
+    pht.innerHTML += `<tr data-cat="${m.cat}">
       <td>${i+1}</td><td>${m.cat}</td>
       <td style="text-align:left;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.name}">${m.name}</td>
       <td style="font-size:11px;color:#666">${m.model}</td>
@@ -1101,6 +1114,16 @@ function filterNDTable(tableId, cat, el) {
       <td>${linkCell(m.url)}</td>
     </tr>`;
   });
+  // 구독료 변동 추적 카테고리 필터
+  const phCats = sortByCatOrder([...new Set(priceHistoryItems.map(m=>m.cat))]);
+  let phFilterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
+  phFilterHtml += `<button class="pill active" onclick="filterNDTable('priceHistoryTable',null,this)">전체 (${priceHistoryItems.length})</button>`;
+  phCats.forEach(cat => {
+    const cnt = priceHistoryItems.filter(m=>m.cat===cat).length;
+    phFilterHtml += `<button class="pill" onclick="filterNDTable('priceHistoryTable','${cat}',this)">${cat} (${cnt})</button>`;
+  });
+  phFilterHtml += '</div>';
+  document.getElementById('priceHistoryFilters').innerHTML = phFilterHtml;
 
   // ── 4사 총 모델수 KPI ──
   const lgModelCount = new Set(lgCurrentPrices.map(m=>m.model)).size;
@@ -1117,7 +1140,7 @@ function filterNDTable(tableId, cat, el) {
     const dotcomCard = dotcomTb.closest('.card');
     const dotcomCats = sortByCatOrder([...new Set(dotcomOnlyModels.map(m=>m.cat))]);
     let dotcomFilterHtml = '<div class="filter-pills" style="margin-bottom:12px">';
-    dotcomFilterHtml += `<button class="pill active" onclick="filterNDTable('dotcomOnlyTable',null,this)">전체</button>`;
+    dotcomFilterHtml += `<button class="pill active" onclick="filterNDTable('dotcomOnlyTable',null,this)">전체 (${dotcomOnlyModels.length})</button>`;
     dotcomCats.forEach(cat => {
       const cnt = dotcomOnlyModels.filter(m=>m.cat===cat).length;
       dotcomFilterHtml += `<button class="pill" onclick="filterNDTable('dotcomOnlyTable','${cat}',this)">${cat} (${cnt})</button>`;
@@ -1134,7 +1157,7 @@ function filterNDTable(tableId, cat, el) {
   if(hptb && halfPriceModels.length > 0) {
     const halfCats = sortByCatOrder([...new Set(halfPriceModels.map(m=>m.cat))]);
     let halfFilt = '<div class="filter-pills" style="margin-bottom:12px">';
-    halfFilt += `<button class="pill active" onclick="filterNDTable('halfPriceTable',null,this)">전체</button>`;
+    halfFilt += `<button class="pill active" onclick="filterNDTable('halfPriceTable',null,this)">전체 (${halfPriceModels.length})</button>`;
     halfCats.forEach(cat => {
       const cnt = halfPriceModels.filter(m=>m.cat===cat).length;
       halfFilt += `<button class="pill" onclick="filterNDTable('halfPriceTable','${cat}',this)">${cat} (${cnt})</button>`;
@@ -1155,7 +1178,7 @@ function filterNDTable(tableId, cat, el) {
     const dotcomCard = dotcomListTb.closest('.card');
     const dotcomCats = sortByCatOrder([...new Set(dotcomOnlyModels.map(m=>m.cat))]);
     let dotcomFilt = '<div class="filter-pills" style="margin-bottom:12px">';
-    dotcomFilt += `<button class="pill active" onclick="filterNDTable('dotcomListTable',null,this)">전체</button>`;
+    dotcomFilt += `<button class="pill active" onclick="filterNDTable('dotcomListTable',null,this)">전체 (${dotcomOnlyModels.length})</button>`;
     dotcomCats.forEach(cat => {
       const cnt = dotcomOnlyModels.filter(m=>m.cat===cat).length;
       dotcomFilt += `<button class="pill" onclick="filterNDTable('dotcomListTable','${cat}',this)">${cat} (${cnt})</button>`;
@@ -1825,13 +1848,25 @@ const samStats = getBrandStats(samsungData, '삼성');
   catHtml += '</tbody></table></div>';
   document.getElementById('subsvalue-category').innerHTML = catHtml;
 
-  // TOP 테이블 생성 헬퍼 (브랜드별 분리)
-  function buildRatioTable(items) {
-    let html = '<div class="table-wrap" style="max-height:500px;overflow-y:auto"><table style="font-size:12px"><thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>총구독료</th><th>일시불</th><th>비율</th></tr></thead><tbody>';
+  // TOP 테이블 생성 헬퍼 (브랜드별 분리) — tableId를 넘기면 카테고리 필터 pills 포함
+  function buildRatioTable(items, tableId) {
+    let html = '';
+    if(tableId) {
+      const cats = sortByCatOrder([...new Set(items.map(m=>m.cat))]);
+      html += '<div class="filter-pills" style="margin-bottom:12px">';
+      html += `<button class="pill active" onclick="filterNDTable('${tableId}',null,this)">전체 (${items.length})</button>`;
+      cats.forEach(cat => {
+        const cnt = items.filter(m=>m.cat===cat).length;
+        html += `<button class="pill" onclick="filterNDTable('${tableId}','${cat}',this)">${cat} (${cnt})</button>`;
+      });
+      html += '</div>';
+    }
+    const tbId = tableId ? ` id="${tableId}"` : '';
+    html += `<div class="table-wrap" style="max-height:500px;overflow-y:auto"><table style="font-size:12px"><thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>총구독료</th><th>일시불</th><th>비율</th></tr></thead><tbody${tbId}>`;
     items.forEach((item, i) => {
       const rc = ratioColor(item.ratio);
       const nameCell = item.url ? `<a href="${item.url}" target="_blank" style="color:inherit;text-decoration:underline dotted">${item.name}</a>` : item.name;
-      html += `<tr><td>${i+1}</td><td>${item.cat}</td><td style="text-align:left;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.name}">${nameCell}</td><td style="font-size:10px;color:#888">${item.model}</td><td style="text-align:right">${fmt(item.monthly)}원</td><td style="text-align:right">${fmt(item.total)}원</td><td style="text-align:right">${fmt(item.lump)}원</td><td style="color:${rc};font-weight:700">${item.ratio}%</td></tr>`;
+      html += `<tr data-cat="${item.cat}"><td>${i+1}</td><td>${item.cat}</td><td style="text-align:left;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.name}">${nameCell}</td><td style="font-size:10px;color:#888">${item.model}</td><td style="text-align:right">${fmt(item.monthly)}원</td><td style="text-align:right">${fmt(item.total)}원</td><td style="text-align:right">${fmt(item.lump)}원</td><td style="color:${rc};font-weight:700">${item.ratio}%</td></tr>`;
     });
     html += '</tbody></table></div>';
     return html;
@@ -1841,12 +1876,12 @@ const samStats = getBrandStats(samsungData, '삼성');
   const lgItems = allItems.filter(x => x.brand === 'LG' && x.ratio > 0);
   const samItems = allItems.filter(x => x.brand === '삼성' && x.ratio > 0);
 
-  document.getElementById('subsvalue-best-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10));
-  document.getElementById('subsvalue-best-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10));
+  document.getElementById('subsvalue-best-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10), 'ratioTbBestLg');
+  document.getElementById('subsvalue-best-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10), 'ratioTbBestSam');
 
   // 4. 비율 높은 TOP 10 — LG / 삼성 각각
-  document.getElementById('subsvalue-worst-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10));
-  document.getElementById('subsvalue-worst-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10));
+  document.getElementById('subsvalue-worst-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10), 'ratioTbWorstLg');
+  document.getElementById('subsvalue-worst-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10), 'ratioTbWorstSam');
 
   // Export for insight use
   window._lgRatioAvg = avgRatio(lgRatio);
@@ -2008,6 +2043,146 @@ const samStats = getBrandStats(samsungData, '삼성');
       }
     }
   });
+})();
+
+// Chart 4: New models by category (horizontal bar)
+(function() {
+  const catCount = {};
+  newModels.forEach(m => { catCount[m.cat] = (catCount[m.cat]||0) + 1; });
+  const sorted = Object.entries(catCount).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const labels = sorted.map(d => d[0]);
+  const data = sorted.map(d => d[1]);
+
+  document.getElementById('newDiscSummaryText').innerHTML =
+    '이번 기간 신규 <strong>' + newModels.length + '</strong>개 모델, 단종 <strong>' + discModels.length + '</strong>개 모델';
+
+  if(sorted.length > 0) {
+    new Chart(document.getElementById('chartNewByCategory'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '신규 모델 수',
+          data: data,
+          backgroundColor: 'rgba(165,0,52,0.7)',
+          borderColor: '#a50034',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) { return ctx.parsed.x + '개 모델'; }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: '#f0f0f0' },
+            ticks: { stepSize: 1 }
+          },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+  } else {
+    document.getElementById('chartNewByCategory').parentElement.innerHTML =
+      '<p style="text-align:center;color:#888;padding:40px 0">이번 기간 신규 모델이 없습니다.</p>';
+  }
+})();
+
+// Chart 5: Brand comparison grouped bar chart
+(function() {
+  const allCats = new Set([
+    ...Object.keys(lgStats),
+    ...Object.keys(samStats),
+    ...Object.keys(cowayStats),
+    ...Object.keys(skStats)
+  ]);
+  const catArr = [...allCats].filter(cat => {
+    let count = 0;
+    if(lgStats[cat]) count++;
+    if(samStats[cat]) count++;
+    if(cowayStats[cat]) count++;
+    if(skStats[cat]) count++;
+    return count >= 2;
+  }).sort();
+
+  if(catArr.length > 0) {
+    new Chart(document.getElementById('chartBrandCompare'), {
+      type: 'bar',
+      data: {
+        labels: catArr,
+        datasets: [
+          {
+            label: 'LG',
+            data: catArr.map(c => lgStats[c]?.avg || 0),
+            backgroundColor: 'rgba(165,0,52,0.75)',
+            borderColor: '#a50034',
+            borderWidth: 1
+          },
+          {
+            label: '삼성',
+            data: catArr.map(c => samStats[c]?.avg || 0),
+            backgroundColor: 'rgba(65,105,225,0.75)',
+            borderColor: '#4169E1',
+            borderWidth: 1
+          },
+          {
+            label: '코웨이',
+            data: catArr.map(c => cowayStats[c]?.avg || 0),
+            backgroundColor: 'rgba(0,165,181,0.75)',
+            borderColor: '#00a5b5',
+            borderWidth: 1
+          },
+          {
+            label: 'SK매직',
+            data: catArr.map(c => skStats[c]?.avg || 0),
+            backgroundColor: 'rgba(230,126,34,0.75)',
+            borderColor: '#e67e22',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { font: { size: 12 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.y;
+                return v ? ctx.dataset.label + ': ' + v.toLocaleString() + '원' : ctx.dataset.label + ': 데이터 없음';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 11 }, maxRotation: 45 }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: '#f0f0f0' },
+            ticks: {
+              callback: function(v) { return v.toLocaleString() + '원'; }
+            }
+          }
+        }
+      }
+    });
+  } else {
+    document.getElementById('chartBrandCompare').parentElement.innerHTML =
+      '<p style="text-align:center;color:#888;padding:40px 0">비교 데이터가 없습니다.</p>';
+  }
 })();
 
 // ===== SCREENSHOT MODAL =====
