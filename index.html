@@ -1239,23 +1239,32 @@ function getBrandStats(data, brandName) {
   const cats = {};
   data.forEach(item => {
     const cat = item.cat;
+    if(!cat) return;
+    if(!cats[cat]) cats[cat] = {brand: brandName, items: [], models: new Set(), allModels: new Set()};
+    // 모든 모델 카운트 (가격 유무 무관 — 라인업 수)
+    cats[cat].allModels.add(item.model || item.name || '');
+    // 가격 있는 모델만 가격 비교용
     const price = Number(item.price);
-    if(!cat || !price || price <= 0) return;
-    if(!cats[cat]) cats[cat] = {brand: brandName, items: [], models: new Set()};
+    if(!price || price <= 0) return;
     cats[cat].items.push({price, name: item.name||'', model: item.model||'', url: item.url||''});
     cats[cat].models.add(item.model || item.name || '');
   });
   Object.values(cats).forEach(c => {
-    c.items.sort((a,b) => a.price - b.price);
-    c.min = c.items[0].price;
-    c.minName = c.items[0].name;
-    c.minUrl = c.items[0].url;
-    c.max = c.items[c.items.length-1].price;
-    c.maxName = c.items[c.items.length-1].name;
-    c.maxUrl = c.items[c.items.length-1].url;
-    c.avg = Math.round(c.items.reduce((s,v) => s+v.price, 0) / c.items.length);
-    c.prices = c.items.map(i => i.price);
-    c.count = c.models.size;
+    if(c.items.length > 0) {
+      c.items.sort((a,b) => a.price - b.price);
+      c.min = c.items[0].price;
+      c.minName = c.items[0].name;
+      c.minUrl = c.items[0].url;
+      c.max = c.items[c.items.length-1].price;
+      c.maxName = c.items[c.items.length-1].name;
+      c.maxUrl = c.items[c.items.length-1].url;
+      c.avg = Math.round(c.items.reduce((s,v) => s+v.price, 0) / c.items.length);
+      c.prices = c.items.map(i => i.price);
+    } else {
+      c.min = 0; c.max = 0; c.avg = 0; c.prices = [];
+      c.minName = ''; c.maxName = ''; c.minUrl = ''; c.maxUrl = '';
+    }
+    c.count = c.allModels.size;  // 전체 모델수 (가격 유무 무관)
   });
   return cats;
 }
