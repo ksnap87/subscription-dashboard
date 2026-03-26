@@ -1121,6 +1121,36 @@ function filterNDTable(tableId, cat, el) {
   });
 })();
 
+// ===== BRAND STATS (글로벌 — INSIGHT LIST, 4사 비교, 가성비에서 공통 사용) =====
+function getBrandStats(data, brandName) {
+  const cats = {};
+  data.forEach(item => {
+    const cat = item.cat;
+    const price = Number(item.price);
+    if(!cat || !price || price <= 0) return;
+    if(!cats[cat]) cats[cat] = {brand: brandName, items: [], models: new Set()};
+    cats[cat].items.push({price, name: item.name||'', model: item.model||'', url: item.url||''});
+    cats[cat].models.add(item.model || item.name || '');
+  });
+  Object.values(cats).forEach(c => {
+    c.items.sort((a,b) => a.price - b.price);
+    c.min = c.items[0].price;
+    c.minName = c.items[0].name;
+    c.minUrl = c.items[0].url;
+    c.max = c.items[c.items.length-1].price;
+    c.maxName = c.items[c.items.length-1].name;
+    c.maxUrl = c.items[c.items.length-1].url;
+    c.avg = Math.round(c.items.reduce((s,v) => s+v.price, 0) / c.items.length);
+    c.prices = c.items.map(i => i.price);
+    c.count = c.models.size;
+  });
+  return cats;
+}
+const lgStats = getBrandStats(lgCurrentPrices, 'LG');
+const cowayStats = getBrandStats(cowayData, '코웨이');
+const skStats = getBrandStats(skmagicData, 'SK매직');
+const samStats = getBrandStats(samsungData, '삼성');
+
 // ===== INSIGHT LIST (auto-generated) =====
 (function() {
   const il = document.getElementById('insightList');
@@ -1266,37 +1296,6 @@ function filterNDTable(tableId, cat, el) {
 
 // ===== 4사 가격 비교 =====
 (function() {
-  function getBrandStats(data, brandName) {
-    const cats = {};
-    data.forEach(item => {
-      const cat = item.cat;
-      const price = Number(item.price);
-      if(!cat || !price || price <= 0) return;
-      if(!cats[cat]) cats[cat] = {brand: brandName, items: [], models: new Set()};
-      cats[cat].items.push({price, name: item.name||'', model: item.model||'', url: item.url||''});
-      // 모델명이 있으면 모델 기준, 없으면 제품명 기준으로 고유 제품 카운트
-      cats[cat].models.add(item.model || item.name || '');
-    });
-    Object.values(cats).forEach(c => {
-      c.items.sort((a,b) => a.price - b.price);
-      c.min = c.items[0].price;
-      c.minName = c.items[0].name;
-      c.minUrl = c.items[0].url;
-      c.max = c.items[c.items.length-1].price;
-      c.maxName = c.items[c.items.length-1].name;
-      c.maxUrl = c.items[c.items.length-1].url;
-      c.avg = Math.round(c.items.reduce((s,v) => s+v.price, 0) / c.items.length);
-      c.prices = c.items.map(i => i.price);
-      c.count = c.models.size;  // 고유 모델종수
-    });
-    return cats;
-  }
-
-  const lgStats = getBrandStats(lgCurrentPrices, 'LG');
-  const cowayStats = getBrandStats(cowayData, '코웨이');
-  const skStats = getBrandStats(skmagicData, 'SK매직');
-  const samStats = getBrandStats(samsungData, '삼성');
-
   // 4사 공통 카테고리 + 삼성vsLG 카테고리
   const allCats = new Set([...Object.keys(lgStats), ...Object.keys(cowayStats), ...Object.keys(skStats), ...Object.keys(samStats)]);
   const fourWayCats = [];
