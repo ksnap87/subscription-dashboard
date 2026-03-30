@@ -340,10 +340,13 @@ a.prod-link:hover { text-decoration: underline; }
   <div class="tabs">
     <button class="tab active" onclick="showSection('summary', this)">Executive Summary</button>
     <button class="tab" onclick="showSection('top10', this)">품목별 가격변동</button>
-    <button class="tab" onclick="showSection('newdisc', this)">신규·단종 현황</button>
     <button class="tab" onclick="showSection('compete', this)">경쟁사 프로모션 비교</button>
     <button class="tab" onclick="showSection('pricecompare', this)">4사 가격 비교</button>
+    <button class="tab" onclick="showSection('lineup', this)">4사 라인업 현황</button>
+    <button class="tab" onclick="showSection('dotcom', this)">닷컴ONLY</button>
+    <button class="tab" onclick="showSection('halfprice', this)">반값할인</button>
     <button class="tab" onclick="showSection('subsvalue', this)">구독 가성비</button>
+    <button class="tab" onclick="showSection('wedding', this)">혼수 프로모션</button>
     <button class="tab" onclick="showSection('report', this)" style="color:#f39c12;font-weight:600">📊 3월 판매감소 분석</button>
   </div>
 </div>
@@ -475,8 +478,22 @@ a.prod-link:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- ==================== TAB 3: 신규·단종 현황 ==================== -->
-<div id="sec-newdisc" class="section">
+<!-- ==================== TAB: 4사 라인업 현황 (신규·단종 통합) ==================== -->
+<div id="sec-lineup" class="section">
+  <div class="card">
+    <div class="card-title">4사 카테고리별 제품 라인업 현황</div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 4사의 구독 라인업을 카테고리별로 비교합니다. 크롤링 데이터 기반.</p>
+    <div id="lineup-table"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">4사 라인업 분포 차트</div>
+    <div class="chart-container" style="height:400px"><canvas id="chartLineup"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">브랜드별 카테고리 커버리지</div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 각 브랜드가 진출한 카테고리와 빈 카테고리를 한눈에 파악합니다.</p>
+    <div id="lineup-coverage"></div>
+  </div>
   <div class="card">
     <div class="card-title">신규·단종 요약</div>
     <p id="newDiscSummaryText" style="font-size:14px;color:#333;margin:0 0 12px;padding:0 4px"></p>
@@ -517,6 +534,72 @@ a.prod-link:hover { text-decoration: underline; }
       <table>
         <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>케어플랜</th><th>계약기간</th><th>월구독료</th></tr></thead>
         <tbody id="dotcomOnlyTable"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card" style="border-left:4px solid #e67e22">
+    <div class="card-title" style="color:#e67e22">⚠️ 일시불 미수집 모델 <span style="font-size:11px;color:#888;font-weight:400">구독가격은 있으나 일시불 데이터가 크롤링되지 않은 모델 · 구독 가성비 분석 제외</span></div>
+    <div id="noLumpFilters"></div>
+    <div class="table-wrap" style="max-height:600px;overflow-y:auto">
+      <table>
+        <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>케어플랜</th><th>계약기간</th><th>월구독료</th><th>총구독료</th></tr></thead>
+        <tbody id="noLumpTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB: 닷컴ONLY ==================== -->
+<div id="sec-dotcom" class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">닷컴ONLY 모델 수 주간 추이</div>
+      <p style="font-size:11px;color:#e67e22;margin:0 0 8px;padding:0 4px">⚠️ W09~W12는 W13 기준 역추적 추정치 · W13부터 실측</p>
+      <div class="chart-container" style="height:280px"><canvas id="chartDotcomTrend"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">카테고리별 닷컴ONLY 변화</div>
+      <p style="font-size:11px;color:#e67e22;margin:0 0 8px;padding:0 4px">⚠️ W09~W12는 추정치</p>
+      <div class="chart-container" style="height:280px"><canvas id="chartDotcomCatTrend"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">LG닷컴 ONLY 제품 현황 <span style="font-size:11px;color:#888;font-weight:400">오프라인 베스타샵에서 구매 불가 · 온라인 전용</span></div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 LG닷컴에서만 구독 가능한 온라인 전용 모델입니다. 오프라인 매장(베스타샵)에서는 취급하지 않습니다.</p>
+    <div id="dotcomKpi" style="margin-bottom:16px"></div>
+    <div id="dotcomFilters2"></div>
+    <div class="table-wrap" style="max-height:700px;overflow-y:auto">
+      <table>
+        <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>케어플랜</th><th>계약기간</th><th>월구독료</th></tr></thead>
+        <tbody id="dotcomTab"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB: 반값할인 ==================== -->
+<div id="sec-halfprice" class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">반값할인 모델 수 주간 추이</div>
+      <p style="font-size:11px;color:#e67e22;margin:0 0 8px;padding:0 4px">⚠️ W09~W12는 현재 모델 리스트 기준 역추적 추정치 · W13부터 실측</p>
+      <div class="chart-container" style="height:280px"><canvas id="chartHalfTrend"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">카테고리별 반값할인 변화</div>
+      <p style="font-size:11px;color:#e67e22;margin:0 0 8px;padding:0 4px">⚠️ W09~W12는 추정치</p>
+      <div class="chart-container" style="height:280px"><canvas id="chartHalfCatTrend"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">12개월 반값할인 대상 모델 <span style="font-size:11px;color:#888;font-weight:400">LG 정수기 구독 · 최대 12개월 50% 할인</span></div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 LG 정수기 중 12개월 반값(50%) 할인이 적용되는 모델입니다. 표시 가격은 반값 적용 후 월구독료이며, 정상가 대비 할인액을 함께 표시합니다.</p>
+    <div id="halfKpi" style="margin-bottom:16px"></div>
+    <div id="halfFilters2"></div>
+    <div class="table-wrap" style="max-height:700px;overflow-y:auto">
+      <table>
+        <thead><tr><th>#</th><th>제품명</th><th>모델명</th><th>반값 월구독료</th><th>정상가</th><th>월 할인액</th><th>닷컴ONLY</th><th>출처</th></tr></thead>
+        <tbody id="halfPriceTab"></tbody>
       </table>
     </div>
   </div>
@@ -1413,6 +1496,171 @@ function filterNDTable(tableId, cat, el) {
       dotcomListTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${dlNameLink}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td></tr>`;
     });
   }
+
+  // ── 닷컴ONLY 전용 탭 렌더링 ──
+  const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
+  const dotcomCats2 = sortByCatOrder([...new Set(dotcomOnlyModels.map(m=>m.cat))]);
+  let dotcomKpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">';
+  dotcomKpiHtml += `<div style="background:#fff5f5;border-radius:10px;padding:14px;text-align:center;border-top:3px solid #a50034"><div style="font-size:11px;color:#888">닷컴ONLY 총</div><div style="font-size:26px;font-weight:700;color:#a50034">${dotcomOnlyModels.length}</div><div style="font-size:10px;color:#aaa">모델</div></div>`;
+  dotcomCats2.forEach(cat => {
+    const cnt = dotcomOnlyModels.filter(m=>m.cat===cat).length;
+    dotcomKpiHtml += `<div style="background:#f8f9fa;border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:#888">${cat}</div><div style="font-size:22px;font-weight:700;color:#333">${cnt}</div></div>`;
+  });
+  dotcomKpiHtml += '</div>';
+  const dotcomKpiEl = document.getElementById('dotcomKpi');
+  if(dotcomKpiEl) dotcomKpiEl.innerHTML = dotcomKpiHtml;
+
+  let dotcomFilterHtml2 = '<div class="filter-pills" style="margin-bottom:12px">';
+  dotcomFilterHtml2 += `<button class="pill active" onclick="filterNDTable('dotcomTab',null,this)">전체 (${dotcomOnlyModels.length})</button>`;
+  dotcomCats2.forEach(cat => {
+    const cnt = dotcomOnlyModels.filter(m=>m.cat===cat).length;
+    dotcomFilterHtml2 += `<button class="pill" onclick="filterNDTable('dotcomTab','${cat}',this)">${cat} (${cnt})</button>`;
+  });
+  dotcomFilterHtml2 += '</div>';
+  const dotcomFilters2El = document.getElementById('dotcomFilters2');
+  if(dotcomFilters2El) dotcomFilters2El.innerHTML = dotcomFilterHtml2;
+  const dotcomTabTb = document.getElementById('dotcomTab');
+  if(dotcomTabTb) {
+    dotcomOnlyModels.forEach((m,i) => {
+      const link = m.url ? '<a href="'+m.url+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+m.name+'</a>' : m.name;
+      dotcomTabTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${link}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan||''}</td><td>${m.term||''}</td><td>${fmt(m.price)}원</td></tr>`;
+    });
+  }
+
+  // ── 반값할인 전용 탭 렌더링 ──
+  const halfPriceTabTb = document.getElementById('halfPriceTab');
+  if(halfPriceTabTb) {
+    const halfOnlyCount = halfPriceModels.filter(m => dotcomSet.has(m.model)).length;
+    const halfOfflineCount = halfPriceModels.length - halfOnlyCount;
+    const avgDiscount = halfPriceModels.length > 0 ? Math.round(halfPriceModels.reduce((s,m) => s + m.price, 0) / halfPriceModels.length) : 0;
+    let halfKpiHtml = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">';
+    halfKpiHtml += `<div style="background:#fff8e1;border-radius:10px;padding:14px;text-align:center;border-top:3px solid #e67e22"><div style="font-size:11px;color:#888">반값 대상</div><div style="font-size:26px;font-weight:700;color:#e67e22">${halfPriceModels.length}</div><div style="font-size:10px;color:#aaa">모델</div></div>`;
+    halfKpiHtml += `<div style="background:#f8f9fa;border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:#888">평균 반값 월구독료</div><div style="font-size:22px;font-weight:700;color:#333">${fmt(avgDiscount)}원</div></div>`;
+    halfKpiHtml += `<div style="background:#fff5f5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:#888">닷컴ONLY</div><div style="font-size:22px;font-weight:700;color:#a50034">${halfOnlyCount}</div></div>`;
+    halfKpiHtml += `<div style="background:#f0faf0;border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:#888">오프라인 가능</div><div style="font-size:22px;font-weight:700;color:#27ae60">${halfOfflineCount}</div></div>`;
+    halfKpiHtml += '</div>';
+    const halfKpiEl = document.getElementById('halfKpi');
+    if(halfKpiEl) halfKpiEl.innerHTML = halfKpiHtml;
+
+    let halfFilterHtml2 = '<div class="filter-pills" style="margin-bottom:12px">';
+    halfFilterHtml2 += `<button class="pill active" onclick="filterNDTable('halfPriceTab',null,this)">전체 (${halfPriceModels.length})</button>`;
+    const halfCats2 = sortByCatOrder([...new Set(halfPriceModels.map(m=>m.cat))]);
+    halfCats2.forEach(cat => {
+      const cnt = halfPriceModels.filter(m=>m.cat===cat).length;
+      halfFilterHtml2 += `<button class="pill" onclick="filterNDTable('halfPriceTab','${cat}',this)">${cat} (${cnt})</button>`;
+    });
+    halfFilterHtml2 += '</div>';
+    const halfFilters2El = document.getElementById('halfFilters2');
+    if(halfFilters2El) halfFilters2El.innerHTML = halfFilterHtml2;
+
+    halfPriceModels.forEach((m,i) => {
+      const isDotcom = dotcomSet.has(m.model);
+      const dotcomBadge = isDotcom ? '<span style="background:#a50034;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">ONLY</span>' : '<span style="background:#27ae60;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">오프라인 가능</span>';
+      const normalPrice = m.price * 2;
+      const discount = normalPrice - m.price;
+      const link = m.url ? '<a href="'+m.url+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+m.name+'</a>' : m.name;
+      const sourceUrl = m.model.startsWith('WD72') || m.model.startsWith('WS5') ? 'https://www.lge.co.kr/benefits/exhibitions/detail-PE00835001' : 'https://www.lge.co.kr/benefits/exhibitions/detail-PE00622001';
+      const sourceName = m.model.startsWith('WD72') || m.model.startsWith('WS5') ? '체인지업' : 'LGE.COM';
+      halfPriceTabTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td style="text-align:left">${link}</td><td style="font-size:11px;color:#666">${m.model}</td><td style="font-weight:600;color:#e67e22">${fmt(m.price)}원</td><td style="color:#888;text-decoration:line-through">${fmt(normalPrice)}원</td><td style="color:#27ae60;font-weight:600">-${fmt(discount)}원</td><td>${dotcomBadge}</td><td><a href="${sourceUrl}" target="_blank" style="color:#3498db;font-size:11px">${sourceName}↗</a></td></tr>`;
+    });
+  }
+})();
+
+// ===== 닷컴ONLY & 반값할인 주간 추이 차트 =====
+(function() {
+  const weeks = Object.keys(weeklySnapshots).sort();
+  const labels = weeks.map(w => w.replace('2026-',''));
+
+  const dotcomCtx = document.getElementById('chartDotcomTrend');
+  if(dotcomCtx) {
+    const totals = weeks.map(w => weeklySnapshots[w].dotcom);
+    const lgTotals = weeks.map(w => weeklySnapshots[w].total);
+    new Chart(dotcomCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '닷컴ONLY 모델 수', data: totals, borderColor: '#a50034', backgroundColor: 'rgba(165,0,52,0.1)', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#a50034' },
+          { label: 'LG 전체 모델 수', data: lgTotals, borderColor: '#ccc', borderDash: [5,5], tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: '닷컴ONLY' } },
+          y1: { position: 'right', beginAtZero: true, title: { display: true, text: '전체 모델' }, grid: { drawOnChartArea: false } }
+        }
+      }
+    });
+  }
+
+  const dotcomCatCtx = document.getElementById('chartDotcomCatTrend');
+  if(dotcomCatCtx) {
+    const lastWeek = weeks[weeks.length - 1];
+    const catCounts = weeklySnapshots[lastWeek].dotcom_cats;
+    const topCats = Object.entries(catCounts).sort((a,b) => b[1] - a[1]).slice(0, 6).map(x => x[0]);
+    const colors = ['#a50034','#4169E1','#00a5b5','#e67e22','#8e44ad','#27ae60'];
+    const datasets = topCats.map((cat, i) => ({
+      label: cat,
+      data: weeks.map(w => (weeklySnapshots[w].dotcom_cats || {})[cat] || 0),
+      borderColor: colors[i], backgroundColor: colors[i] + '20',
+      tension: 0.3, pointRadius: 4
+    }));
+    new Chart(dotcomCatCtx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: '모델 수' } } }
+      }
+    });
+  }
+
+  const halfCtx = document.getElementById('chartHalfTrend');
+  if(halfCtx) {
+    const halfTotals = weeks.map(w => weeklySnapshots[w].half);
+    new Chart(halfCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: '반값할인 모델 수', data: halfTotals,
+          borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.1)',
+          fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#e67e22'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: '모델 수' } } }
+      }
+    });
+  }
+
+  const halfCatCtx = document.getElementById('chartHalfCatTrend');
+  if(halfCatCtx) {
+    const allHalfCats = new Set();
+    weeks.forEach(w => Object.keys(weeklySnapshots[w].half_cats || {}).forEach(c => allHalfCats.add(c)));
+    const halfCatColors = ['#e67e22','#8e44ad','#3498db','#27ae60'];
+    const halfDatasets = [...allHalfCats].map((cat, i) => ({
+      label: cat,
+      data: weeks.map(w => (weeklySnapshots[w].half_cats || {})[cat] || 0),
+      borderColor: halfCatColors[i % halfCatColors.length],
+      backgroundColor: halfCatColors[i % halfCatColors.length] + '20',
+      tension: 0.3, pointRadius: 4, fill: true
+    }));
+    new Chart(halfCatCtx, {
+      type: 'line',
+      data: { labels, datasets: halfDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: '모델 수' } } }
+      }
+    });
+  }
 })();
 
 // ===== THREAT TABLE =====
@@ -1982,6 +2230,110 @@ const samStats = getBrandStats(samsungData, '삼성');
     insightsHtml += '</div>';
 
     document.getElementById('price-insights').innerHTML = insightsHtml || '<p style="color:#999">인사이트를 생성할 데이터가 부족합니다.</p>';
+
+    // ── 4사 라인업 현황 탭 렌더링 ──
+    let lineupHtml = '';
+    lineupHtml += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">';
+    [['삼성', totalSam, '#4169E1'], ['LG', totalLg, '#a50034'], ['코웨이', totalCoway, '#00a5b5'], ['SK매직', totalSk, '#e67e22']].forEach(([name, count, color]) => {
+      lineupHtml += `<div style="background:white;border-radius:10px;padding:16px;text-align:center;border-top:3px solid ${color}">`;
+      lineupHtml += `<div style="font-size:12px;color:#888">${name}</div>`;
+      lineupHtml += `<div style="font-size:28px;font-weight:700;color:${color};margin:4px 0">${count}</div>`;
+      lineupHtml += `<div style="font-size:11px;color:#aaa">구독 모델 수</div></div>`;
+    });
+    lineupHtml += '</div>';
+    lineupHtml += '<div class="table-wrap"><table><thead><tr><th style="text-align:left">카테고리</th><th style="color:#4169E1">삼성</th>';
+    lineupHtml += '<th style="color:#a50034">LG</th><th style="color:#00a5b5">코웨이</th><th style="color:#e67e22">SK매직</th><th>합계</th></tr></thead><tbody>';
+    allCatRows.forEach(item => {
+      const total = item.samCount + item.lgCount + item.cowayCount + item.skCount;
+      const maxCount = Math.max(item.samCount, item.lgCount, item.cowayCount, item.skCount);
+      const cell = (count, color) => {
+        if(!count) return '<span style="color:#ccc">-</span>';
+        const bold = count === maxCount ? 'font-weight:700;' : '';
+        return `<span style="${bold}color:${color}">${count}</span>`;
+      };
+      lineupHtml += `<tr><td style="font-weight:600;text-align:left">${item.cat}</td>`;
+      lineupHtml += `<td>${cell(item.samCount,'#4169E1')}</td>`;
+      lineupHtml += `<td>${cell(item.lgCount,'#a50034')}</td>`;
+      lineupHtml += `<td>${cell(item.cowayCount,'#00a5b5')}</td>`;
+      lineupHtml += `<td>${cell(item.skCount,'#e67e22')}</td>`;
+      lineupHtml += `<td style="font-weight:600;color:#333">${total}</td></tr>`;
+    });
+    lineupHtml += `<tr style="background:#f0f2f5;font-weight:700;border-top:2px solid #333">`;
+    lineupHtml += `<td style="text-align:left">합계</td>`;
+    lineupHtml += `<td style="color:#4169E1">${totalSam}</td>`;
+    lineupHtml += `<td style="color:#a50034">${totalLg}</td>`;
+    lineupHtml += `<td style="color:#00a5b5">${totalCoway}</td>`;
+    lineupHtml += `<td style="color:#e67e22">${totalSk}</td>`;
+    lineupHtml += `<td>${totalSam+totalLg+totalCoway+totalSk}</td></tr>`;
+    lineupHtml += '</tbody></table></div>';
+    const lineupTableEl = document.getElementById('lineup-table');
+    if(lineupTableEl) lineupTableEl.innerHTML = lineupHtml;
+
+    // 라인업 차트
+    const lineupCats = allCatRows.map(x => x.cat);
+    const lineupCtx = document.getElementById('chartLineup');
+    if(lineupCtx) {
+      new Chart(lineupCtx, {
+        type: 'bar',
+        data: {
+          labels: lineupCats,
+          datasets: [
+            { label: '삼성', data: allCatRows.map(x => x.samCount), backgroundColor: 'rgba(65,105,225,0.75)' },
+            { label: 'LG', data: allCatRows.map(x => x.lgCount), backgroundColor: 'rgba(165,0,52,0.75)' },
+            { label: '코웨이', data: allCatRows.map(x => x.cowayCount), backgroundColor: 'rgba(0,165,181,0.75)' },
+            { label: 'SK매직', data: allCatRows.map(x => x.skCount), backgroundColor: 'rgba(230,126,34,0.75)' }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'top' } },
+          scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true, title: { display: true, text: '모델 수' } } }
+        }
+      });
+    }
+
+    // 커버리지 분석
+    let coverageHtml = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">';
+    const brands = [['삼성','samCount','#4169E1'], ['LG','lgCount','#a50034'], ['코웨이','cowayCount','#00a5b5'], ['SK매직','skCount','#e67e22']];
+    brands.forEach(([name, key, color]) => {
+      const present = allCatRows.filter(x => x[key] > 0);
+      const absent = allCatRows.filter(x => x[key] === 0);
+      const coverage = Math.round(present.length / allCatRows.length * 100);
+      coverageHtml += `<div style="background:white;border-radius:10px;padding:16px;border-left:4px solid ${color}">`;
+      coverageHtml += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">`;
+      coverageHtml += `<h4 style="margin:0;font-size:14px;color:${color}">${name}</h4>`;
+      coverageHtml += `<span style="font-size:13px;font-weight:600;color:${color}">${present.length}/${allCatRows.length} 카테고리 (${coverage}%)</span></div>`;
+      coverageHtml += `<div style="background:#f0f2f5;border-radius:4px;height:8px;margin-bottom:12px"><div style="background:${color};border-radius:4px;height:100%;width:${coverage}%"></div></div>`;
+      if(absent.length > 0) {
+        coverageHtml += `<div style="font-size:12px;color:#999">미진출: ${absent.map(x => x.cat).join(', ')}</div>`;
+      } else {
+        coverageHtml += `<div style="font-size:12px;color:#27ae60;font-weight:600">전 카테고리 진출</div>`;
+      }
+      coverageHtml += '</div>';
+    });
+    coverageHtml += '</div>';
+    const coverageEl = document.getElementById('lineup-coverage');
+    if(coverageEl) coverageEl.innerHTML = coverageHtml;
+
+    // 일시불 미수집 모델 렌더링
+    const noLumpModels = lgCurrentPrices.filter(m => m.price > 0 && (!m.lumpsum || m.lumpsum === 0));
+    const noLumpTable = document.getElementById('noLumpTable');
+    if(noLumpTable && noLumpModels.length > 0) {
+      const noLumpCats = sortByCatOrder([...new Set(noLumpModels.map(m=>m.cat))]);
+      let nlFilt = '<div class="filter-pills" style="margin-bottom:12px">';
+      nlFilt += `<button class="pill active" onclick="filterNDTable('noLumpTable',null,this)">전체 (${noLumpModels.length})</button>`;
+      noLumpCats.forEach(cat => {
+        const cnt = noLumpModels.filter(m=>m.cat===cat).length;
+        nlFilt += `<button class="pill" onclick="filterNDTable('noLumpTable','${cat}',this)">${cat} (${cnt})</button>`;
+      });
+      nlFilt += '</div>';
+      const nlFiltersEl = document.getElementById('noLumpFilters');
+      if(nlFiltersEl) nlFiltersEl.innerHTML = nlFilt;
+      noLumpModels.forEach((m,i) => {
+        const link = m.url ? '<a href="'+m.url+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+m.name+'</a>' : m.name;
+        noLumpTable.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${link}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan||''}</td><td>${m.term||''}</td><td>${fmt(m.price)}원</td><td>${fmt(m.price * parseInt(m.term||'0') * (m.term&&m.term.includes('년') ? 12 : 1))}원</td></tr>`;
+      });
+    }
   })();
 })();
 
