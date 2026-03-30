@@ -2573,6 +2573,9 @@ const samStats = getBrandStats(samsungData, '삼성');
       '<p style="text-align:center;color:#888;padding:40px 0">비교 데이터가 없습니다.</p>';
   }
 })();
+// onclick 핸들러를 글로벌 스코프에 등록
+window.showCatDetail = showCatDetail;
+window.filterNDTable = filterNDTable;
 } // end initDashboard
 
 
