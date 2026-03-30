@@ -634,7 +634,7 @@ a.prod-link:hover { text-decoration: underline; }
 <!-- ==================== TAB 6: 구독 가성비 ==================== -->
 <div id="sec-subsvalue" class="section">
   <div class="card">
-    <div class="card-title">구독 가성비 분석 (총구독료 vs 일시불) <span style="font-size:11px;color:#888;font-weight:400">6년 계약 기준 · 카드할인전 가격</span></div>
+    <div class="card-title">구독 가성비 분석 (총구독료 vs 일시불) <span style="font-size:11px;color:#888;font-weight:400">전 계약기간 · 카드할인전 가격</span></div>
     <p style="font-size:12px;color:#888;margin:0 0 12px">💡 총구독료 ÷ 일시불 × 100 = 가성비 비율. <span style="color:#27ae60;font-weight:600">&lt;100%</span> 구독이 저렴 · <span style="color:#f39c12;font-weight:600">100~130%</span> 비슷 · <span style="color:#e74c3c;font-weight:600">&gt;130%</span> 구독이 비쌈</p>
     <div id="subsvalue-summary"></div>
   </div>
@@ -1999,23 +1999,21 @@ const samStats = getBrandStats(samsungData, '삼성');
     return item.url || '';
   }
 
-  // LG: 6년 계약 + 총구독료/일시불 모두 있는 항목
+  // LG: 총구독료/일시불 모두 있는 항목 (전 계약기간, 벽걸이/벽밀착 중복 제거)
   const lgRatio = [];
   lgCurrentPrices.forEach(item => {
     const ts = Number(item.totalSub), ls = Number(item.lumpsum);
-    const per = String(item.period || '');
-    if(per.indexOf('6') >= 0 && ts > 0 && ls > 0) {
-      lgRatio.push({brand:'LG', cat:item.cat, name:item.name, model:item.model, monthly:Number(item.price), total:ts, lump:ls, ratio:pct(ts,ls), url:item.url||''});
+    if(ts > 0 && ls > 0 && !item.model.endsWith('-WALL') && !item.model.endsWith('-WALL2')) {
+      lgRatio.push({brand:'LG', cat:item.cat, name:item.name, model:item.model, plan:item.plan||'', period:item.period||'', svc:item.svc||'', monthly:Number(item.price), total:ts, lump:ls, ratio:pct(ts,ls), url:item.url||''});
     }
   });
 
-  // 삼성: 6년 계약 + 총구독료/일시불 모두 있는 항목
+  // 삼성: 총구독료/일시불 모두 있는 항목 (전 계약기간)
   const samRatio = [];
   samsungData.forEach(item => {
     const ts = Number(item.totalSub), ls = Number(item.lumpsum), price = Number(item.price);
-    const per = String(item.period || '');
-    if(per.indexOf('6') >= 0 && ts > 0 && ls > 0 && price > 0) {
-      samRatio.push({brand:'삼성', cat:item.cat, name:item.name, model:item.model, monthly:price, total:ts, lump:ls, ratio:pct(ts,ls), url:samProductUrl(item)});
+    if(ts > 0 && ls > 0 && price > 0) {
+      samRatio.push({brand:'삼성', cat:item.cat, name:item.name, model:item.model, plan:item.svcType||'', period:item.period||'', svc:item.svcTerm ? item.svcTerm+'개월' : '', monthly:price, total:ts, lump:ls, ratio:pct(ts,ls), url:samProductUrl(item)});
     }
   });
 
@@ -2036,7 +2034,7 @@ const samStats = getBrandStats(samsungData, '삼성');
     const mid = b.items.filter(x => x.ratio >= 100 && x.ratio <= 130).length;
     const worse = b.items.filter(x => x.ratio > 130).length;
     summaryHtml += `<div style="background:#f8f9fa;border-radius:8px;padding:16px;border-top:3px solid ${b.color}">`;
-    summaryHtml += `<div style="font-weight:700;color:${b.color};margin-bottom:8px">${b.brand} (6년 기준)</div>`;
+    summaryHtml += `<div style="font-weight:700;color:${b.color};margin-bottom:8px">${b.brand} (전 계약기간)</div>`;
     summaryHtml += `<div style="font-size:13px;color:#666">분석 대상: <b>${b.items.length}</b>개 모델</div>`;
     summaryHtml += `<div style="font-size:13px;color:#666">평균 비율: <b style="color:${ratioColor(avg)}">${avg}%</b></div>`;
     summaryHtml += `<div style="font-size:13px;margin-top:4px"><span style="color:#27ae60">■</span> 구독저렴 <b>${better}</b> · <span style="color:#f39c12">■</span> 비슷 <b>${mid}</b> · <span style="color:#e74c3c">■</span> 구독비쌈 <b>${worse}</b></div>`;
@@ -2113,27 +2111,53 @@ const samStats = getBrandStats(samsungData, '삼성');
       });
       html += '</div>';
     }
-    const tbId = tableId ? ` id="${tableId}"` : '';
-    html += `<div class="table-wrap" style="max-height:500px;overflow-y:auto"><table style="font-size:12px"><thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>총구독료</th><th>일시불</th><th>비율</th></tr></thead><tbody${tbId}>`;
+    html += `<div class="table-wrap" style="max-height:500px;overflow-y:auto"><table style="font-size:12px"><thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>케어플랜</th><th>케어주기</th><th>계약기간</th><th>월구독료</th><th>총구독료</th><th>일시불</th><th>비율</th></tr></thead><tbody>`;
     items.forEach((item, i) => {
       const rc = ratioColor(item.ratio);
       const nameCell = item.url ? `<a href="${item.url}" target="_blank" style="color:inherit;text-decoration:underline dotted">${item.name}</a>` : item.name;
-      html += `<tr data-cat="${item.cat}"><td>${i+1}</td><td>${item.cat}</td><td style="text-align:left;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.name}">${nameCell}</td><td style="font-size:10px;color:#888">${item.model}</td><td style="text-align:right">${fmt(item.monthly)}원</td><td style="text-align:right">${fmt(item.total)}원</td><td style="text-align:right">${fmt(item.lump)}원</td><td style="color:${rc};font-weight:700">${item.ratio}%</td></tr>`;
+      html += `<tr data-cat="${item.cat}"><td>${i+1}</td><td>${item.cat}</td><td style="text-align:left;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.name}">${nameCell}</td><td style="font-size:10px;color:#888">${item.model}</td><td style="font-size:11px">${item.plan||'-'}</td><td style="font-size:11px">${item.svc||'-'}</td><td style="font-size:11px">${item.period||'-'}</td><td style="text-align:right">${fmt(item.monthly)}원</td><td style="text-align:right">${fmt(item.total)}원</td><td style="text-align:right">${fmt(item.lump)}원</td><td style="color:${rc};font-weight:700">${item.ratio}%</td></tr>`;
     });
     html += '</tbody></table></div>';
     return html;
   }
 
-  // 3. 비율 낮은 TOP 10 — LG / 삼성 각각
+  // 3. 카테고리별 TOP 10 — 비율 낮은 (LG / 삼성)
   const lgItems = allItems.filter(x => x.brand === 'LG' && x.ratio > 0);
   const samItems = allItems.filter(x => x.brand === '삼성' && x.ratio > 0);
 
-  document.getElementById('subsvalue-best-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10), 'ratioTbBestLg');
-  document.getElementById('subsvalue-best-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => a.ratio - b.ratio).slice(0, 10), 'ratioTbBestSam');
+  function buildCatTop10(items, containerId, prefix, sortAsc) {
+    const allCats = sortByCatOrder([...new Set(items.map(m=>m.cat))]);
+    const catTop = {};
+    allCats.forEach(cat => {
+      const ci = items.filter(x => x.cat === cat);
+      catTop[cat] = sortAsc ? ci.sort((a,b) => a.ratio - b.ratio).slice(0,10) : ci.sort((a,b) => b.ratio - a.ratio).slice(0,10);
+    });
+    const allTop = sortAsc ? [...items].sort((a,b) => a.ratio - b.ratio).slice(0,10) : [...items].sort((a,b) => b.ratio - a.ratio).slice(0,10);
+    let html = '<div class="filter-pills" style="margin-bottom:12px">';
+    html += `<button class="pill active" onclick="window._showCatTop('${prefix}','__all__',this)">전체 (${items.length})</button>`;
+    allCats.forEach(cat => {
+      const cnt = items.filter(m=>m.cat===cat).length;
+      html += `<button class="pill" onclick="window._showCatTop('${prefix}','${cat}',this)">${cat} (${cnt})</button>`;
+    });
+    html += '</div>';
+    html += `<div id="${prefix}-content">${buildRatioTable(allTop, null)}</div>`;
+    document.getElementById(containerId).innerHTML = html;
+    window['_catData_' + prefix] = { allTop, catTop };
+  }
+  window._showCatTop = function(prefix, cat, btn) {
+    const d = window['_catData_' + prefix];
+    if(!d) return;
+    document.getElementById(prefix + '-content').innerHTML = buildRatioTable(cat === '__all__' ? d.allTop : (d.catTop[cat]||[]), null);
+    btn.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  };
 
-  // 4. 비율 높은 TOP 10 — LG / 삼성 각각
-  document.getElementById('subsvalue-worst-lg').innerHTML = buildRatioTable(lgItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10), 'ratioTbWorstLg');
-  document.getElementById('subsvalue-worst-sam').innerHTML = buildRatioTable(samItems.sort((a,b) => b.ratio - a.ratio).slice(0, 10), 'ratioTbWorstSam');
+  buildCatTop10(lgItems, 'subsvalue-best-lg', 'bestLg', true);
+  buildCatTop10(samItems, 'subsvalue-best-sam', 'bestSam', true);
+
+  // 4. 카테고리별 TOP 10 — 비율 높은 (LG / 삼성)
+  buildCatTop10(lgItems, 'subsvalue-worst-lg', 'worstLg', false);
+  buildCatTop10(samItems, 'subsvalue-worst-sam', 'worstSam', false);
 
   // Export for insight use
   window._lgRatioAvg = avgRatio(lgRatio);
