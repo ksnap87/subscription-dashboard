@@ -2053,6 +2053,7 @@ const samStats = getBrandStats(samsungData, '삼성');
 
 
     // 2. 4사 라인업 현황 → 별도 탭으로 렌더링
+    {
     const allBrandCats = new Set([...Object.keys(samStats), ...Object.keys(lgStats), ...Object.keys(cowayStats), ...Object.keys(skStats)]);
     const allCatRows = [];
     allBrandCats.forEach(cat => {
@@ -2149,6 +2150,7 @@ const samStats = getBrandStats(samsungData, '삼성');
     });
     coverageHtml += '</div>';
     document.getElementById('lineup-coverage').innerHTML = coverageHtml;
+    } // end lineup tab block
 
     // 3. 경쟁사별 평균 가격 차이 요약
     insightsHtml += '<div style="background:#f0f4ff;border-radius:8px;padding:16px;border-left:4px solid #3498db">';
