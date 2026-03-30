@@ -434,32 +434,6 @@ a.prod-link:hover { text-decoration: underline; }
     </div>
   </div>
 
-  <div class="card" style="border-left:4px solid #a50034">
-    <div class="card-title" style="cursor:pointer" onclick="document.getElementById('dotcomDetail').style.display=document.getElementById('dotcomDetail').style.display==='none'?'block':'none'">
-      🔴 LG닷컴 ONLY — 57개 모델 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
-    </div>
-    <div id="dotcomDetail" style="display:none">
-      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
-        <table>
-          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th></tr></thead>
-          <tbody id="dotcomListTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <div class="card" style="border-left:4px solid #e67e22">
-    <div class="card-title" style="cursor:pointer" onclick="document.getElementById('halfPriceDetail').style.display=document.getElementById('halfPriceDetail').style.display==='none'?'block':'none'">
-      🟠 12개월 반값할인 — 0개 모델 <span style="font-size:11px;color:#888;font-weight:400">(클릭하여 펼치기/접기)</span>
-    </div>
-    <div id="halfPriceDetail" style="display:none">
-      <div class="table-wrap" style="max-height:500px;overflow-y:auto">
-        <table>
-          <thead><tr><th>#</th><th>카테고리</th><th>제품명</th><th>모델명</th><th>월구독료</th><th>닷컴ONLY</th></tr></thead>
-          <tbody id="halfPriceTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -1306,49 +1280,9 @@ function filterNDTable(tableId, cat, el) {
       dotcomTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${dotcomNameLink}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan}</td><td>${m.term}</td><td>${fmt(m.price)}원</td></tr>`;
     });
   }
-  // 반값할인 모델 전체 (닷컴ONLY 여부 표시 + 카테고리 필터)
-  const hptb = document.getElementById('halfPriceTable');
-  if(hptb && halfPriceModels.length > 0) {
-    const halfCats = sortByCatOrder([...new Set(halfPriceModels.map(m=>m.cat))]);
-    let halfFilt = '<div class="filter-pills" style="margin-bottom:12px">';
-    halfFilt += `<button class="pill active" onclick="filterNDTable('halfPriceTable',null,this)">전체 (${halfPriceModels.length})</button>`;
-    halfCats.forEach(cat => {
-      const cnt = halfPriceModels.filter(m=>m.cat===cat).length;
-      halfFilt += `<button class="pill" onclick="filterNDTable('halfPriceTable','${cat}',this)">${cat} (${cnt})</button>`;
-    });
-    halfFilt += '</div>';
-    document.getElementById('halfPriceDetail').insertAdjacentHTML('afterbegin', halfFilt);
-
-    const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
-    halfPriceModels.forEach((m,i) => {
-      const isDotcom = dotcomSet.has(m.model);
-      const dotcomBadge = isDotcom ? '<span style="background:#a50034;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">ONLY</span>' : '';
-      const hpNameLink = m.url ? '<a href="'+m.url+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+m.name+'</a>' : m.name;
-      hptb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${hpNameLink}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td><td>${dotcomBadge}</td></tr>`;
-    });
-  }
-  // 닷컴ONLY 전체 리스트 (카테고리 필터)
-  const dotcomListTb = document.getElementById('dotcomListTable');
-  if(dotcomListTb) {
-    const dotcomCard = dotcomListTb.closest('.card');
-    const dotcomCats = sortByCatOrder([...new Set(dotcomOnlyModels.map(m=>m.cat))]);
-    let dotcomFilt = '<div class="filter-pills" style="margin-bottom:12px">';
-    dotcomFilt += `<button class="pill active" onclick="filterNDTable('dotcomListTable',null,this)">전체 (${dotcomOnlyModels.length})</button>`;
-    dotcomCats.forEach(cat => {
-      const cnt = dotcomOnlyModels.filter(m=>m.cat===cat).length;
-      dotcomFilt += `<button class="pill" onclick="filterNDTable('dotcomListTable','${cat}',this)">${cat} (${cnt})</button>`;
-    });
-    dotcomFilt += '</div>';
-    document.getElementById('dotcomDetail').insertAdjacentHTML('afterbegin', dotcomFilt);
-
-    dotcomOnlyModels.forEach((m,i) => {
-      const dlNameLink = m.url ? '<a href="'+m.url+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+m.name+'</a>' : m.name;
-      dotcomListTb.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${dlNameLink}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${fmt(m.price)}원</td></tr>`;
-    });
-  }
 })();
 
-// ===== 닷컴ONLY & 반값할인 탭 ===== 
+// ===== 닷컴ONLY & 반값할인 탭 =====
 (function() {
   // ── 닷컴ONLY 탭 렌더링 ──
   const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
