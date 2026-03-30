@@ -346,6 +346,7 @@ a.prod-link:hover { text-decoration: underline; }
     <button class="tab" onclick="showSection('dotcom', this)">닷컴ONLY</button>
     <button class="tab" onclick="showSection('halfprice', this)">반값할인</button>
     <button class="tab" onclick="showSection('subsvalue', this)">구독 가성비</button>
+    <button class="tab" onclick="showSection('wedding', this)">혼수 프로모션</button>
     <button class="tab" onclick="showSection('report', this)" style="color:#f39c12;font-weight:600">📊 3월 판매감소 분석</button>
   </div>
 </div>
@@ -711,7 +712,212 @@ a.prod-link:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- ==================== TAB 7: 3월 판매감소 분석 ==================== -->
+<!-- ==================== TAB: 혼수 프로모션 비교 ==================== -->
+<div id="sec-wedding" class="section">
+
+  <!-- 요약 카드 -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+    <div class="card" style="border-top:3px solid #4169E1;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:#4169E1;margin-bottom:8px">삼성</div>
+      <div style="font-size:11px;color:#666;line-height:1.6">혼수클럽 (상시)<br>무상수리 3년 연장<br>최대 500만 캐시백</div>
+    </div>
+    <div class="card" style="border-top:3px solid #a50034;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:#a50034;margin-bottom:8px">LG</div>
+      <div style="font-size:11px;color:#666;line-height:1.6">웨딩 멤버스 (상시)<br>4% 추가 쿠폰<br>최대 114만원 쿠폰팩</div>
+    </div>
+    <div class="card" style="border-top:3px solid #00a5b5;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:#00a5b5;margin-bottom:8px">코웨이</div>
+      <div style="font-size:11px;color:#666;line-height:1.6">코웨이페스타 (~4/28)<br>최대 15개월 반값<br>패키지 15% 추가</div>
+    </div>
+    <div class="card" style="border-top:3px solid #e67e22;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:#e67e22;margin-bottom:8px">SK매직</div>
+      <div style="font-size:11px;color:#666;line-height:1.6">혼수 전용 없음<br>반값 렌탈 + 패키지<br>설치비/등록비 면제</div>
+    </div>
+  </div>
+
+  <!-- 4사 혼수 혜택 비교표 -->
+  <div class="card">
+    <div class="card-title">4사 혼수/신혼 프로모션 비교</div>
+    <p style="font-size:13px;color:#555;margin:0 0 12px;padding:0 4px">💡 혼수 시즌 구독/렌탈 혜택을 4사별로 비교합니다. [출처↗] 클릭 시 해당 페이지로 이동합니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px">항목</th><th style="color:#4169E1">삼성</th><th style="color:#a50034">LG</th><th style="color:#00a5b5">코웨이</th><th style="color:#e67e22">SK매직</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;text-align:left">혼수 전용 프로그램</td>
+            <td style="text-align:left;font-size:13px">혼수클럽 (연간 상시) <a href="https://www.samsung.com/sec/event/wedding/" target="_blank" style="color:#4169E1;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">웨딩 멤버스 (연간 상시) <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00482011" target="_blank" style="color:#a50034;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px;color:#999">혼수 전용 없음 — 코웨이페스타로 대체 <a href="https://www.coway.com/event/detail?eventno=349" target="_blank" style="color:#00a5b5;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px;color:#999">혼수 전용 없음 — 패키지 결합으로 대체 <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=7937" target="_blank" style="color:#e67e22;font-size:11px">[출처↗]</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">인증 조건</td>
+            <td style="text-align:left;font-size:13px">혼수클럽 가입 (삼성닷컴)</td>
+            <td style="text-align:left;font-size:13px">청첩장/예식장 계약서/혼인관계증명서 중 택1</td>
+            <td style="text-align:left;font-size:13px;color:#27ae60">인증 불필요</td>
+            <td style="text-align:left;font-size:13px;color:#27ae60">인증 불필요</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">핵심 할인</td>
+            <td style="text-align:left;font-size:13px">500만+ 구매 시 9대 가전 <b>무상수리 3년 연장</b> + 최대 80만P <a href="https://www.samsung.com/sec/membership/membershipMileage/" target="_blank" style="color:#4169E1;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">웨딩 인증 시 <b>4% 추가 할인 쿠폰</b> + 최대 114만원 쿠폰팩 <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00482011" target="_blank" style="color:#a50034;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">전제품 <b>최대 15개월 렌탈 반값</b> (2/26~4/28) <a href="https://www.coway.com/event/detail?eventno=349" target="_blank" style="color:#00a5b5;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">약정별 <b>최대 12개월 반값</b> + 설치비/등록비 면제 <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=3068" target="_blank" style="color:#e67e22;font-size:11px">[출처↗]</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">다품목 결합</td>
+            <td style="text-align:left;font-size:13px">다다익선 — 2품목 5만/3품목 10만/4품목+ 15만원 주유권 <a href="https://www.samsung.com/sec/event/spring-ai-subs/" target="_blank" style="color:#4169E1;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">2품목 결합 10만P / 3품목+ 20만P + 월 최대 5% 할인 <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00721001" target="_blank" style="color:#a50034;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">2대+ 패키지 <b>월 15% 추가 할인</b> + 3대+ 최대 5개월 추가 반값 <a href="https://www.coway.com/event/package_promo" target="_blank" style="color:#00a5b5;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">2대 이상 결합 시 각 <b>월 2,000~10,500원 할인</b> <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=7937" target="_blank" style="color:#e67e22;font-size:11px">[출처↗]</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">제휴카드</td>
+            <td style="text-align:left;font-size:13px">삼성카드 최대 <b>500만 캐시백</b> + 월 최대 5만원 <a href="https://www.samsung.com/sec/ai-subs/guide/#smart_card_samsung" target="_blank" style="color:#4169E1;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">신한 등 4개사 월 최대 <b>26,000원</b> <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00843008" target="_blank" style="color:#a50034;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">현대/LOCA <b>11만 캐시백</b> + 월 최대 4만원 <a href="https://www.coway.com/event/detail?eventno=304" target="_blank" style="color:#00a5b5;font-size:11px">[출처↗]</a></td>
+            <td style="text-align:left;font-size:13px">롯데LOCA 월 최대 <b>27,000원</b> <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=828" target="_blank" style="color:#e67e22;font-size:11px">[출처↗]</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">구독 방식</td>
+            <td style="text-align:left;font-size:13px">AI 구독클럽 (올인원2.0)</td>
+            <td style="text-align:left;font-size:13px">케어솔루션 구독</td>
+            <td style="text-align:left;font-size:13px">렌탈 구독</td>
+            <td style="text-align:left;font-size:13px">렌탈 구독</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;text-align:left">대상 제품</td>
+            <td style="text-align:left;font-size:13px">비스포크 냉장고, 세탁기, 에어컨, TV 등 전 가전</td>
+            <td style="text-align:left;font-size:13px">냉장고, 세탁기, TV, 정수기, 에어컨 등 전 가전</td>
+            <td style="text-align:left;font-size:13px">정수기, 공기청정기, 비데, 매트리스, 안마의자</td>
+            <td style="text-align:left;font-size:13px">정수기, 공기청정기, 비데, 전기레인지</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 브랜드별 상세 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <!-- 삼성 -->
+    <div class="card" style="border-top:3px solid #4169E1">
+      <div class="card-title" style="font-size:14px;color:#4169E1">삼성 — 혼수클럽 + AI 구독클럽</div>
+      <div style="font-size:13px;line-height:1.8;color:#444">
+        <div style="background:#f0f4ff;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>혼수클럽</b> (연간 상시)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>500만+ 구매: 9대 가전 무상수리 3년 연장</li>
+            <li>금액대별 최대 80만 멤버십 포인트</li>
+            <li>삼성카드 실적별 최대 500만 캐시백</li>
+          </ul>
+          <a href="https://www.samsung.com/sec/event/wedding/" target="_blank" style="color:#4169E1;font-size:11px">[혼수클럽↗]</a>
+        </div>
+        <div style="background:#f0f4ff;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>AI 구독클럽 봄 프로모션</b> (2/9~4/30)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>동시 구독 포인트 2배</li>
+            <li>다다익선 — 2~4품목 주유권 최대 15만원</li>
+            <li>블루패스: 평일 저녁/주말 맞춤 설치, 이사 재설치</li>
+          </ul>
+          <a href="https://www.samsung.com/sec/event/spring-ai-subs/" target="_blank" style="color:#4169E1;font-size:11px">[봄 프로모션↗]</a>
+          <a href="https://www.samsung.com/sec/ai-subs/" target="_blank" style="color:#4169E1;font-size:11px">[AI 구독클럽↗]</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LG -->
+    <div class="card" style="border-top:3px solid #a50034">
+      <div class="card-title" style="font-size:14px;color:#a50034">LG — 웨딩 멤버스 + 케어솔루션</div>
+      <div style="font-size:13px;line-height:1.8;color:#444">
+        <div style="background:#fff5f5;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>웨딩 멤버스</b> (연간 상시, 웨딩 인증 필요)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>웨딩 인증 시 4% 추가 할인 쿠폰 (90일간)</li>
+            <li>2개+ 다른 제품군 구매: 캐시백 + 포인트 + 쿠폰 + 사은품</li>
+            <li>최대 114만원 상당 쿠폰팩</li>
+          </ul>
+          <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00482011" target="_blank" style="color:#a50034;font-size:11px">[웨딩 멤버스↗]</a>
+        </div>
+        <div style="background:#fff5f5;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>케어솔루션 구독 혜택</b> (3월)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>첫 구독 10만P + 다품목 결합 최대 20만P</li>
+            <li>2품목 이상 구독 시 월 최대 5% 결합 할인</li>
+            <li>정수기 12개월 50% 반값</li>
+          </ul>
+          <a href="https://www.lge.co.kr/benefits/exhibitions/detail-PE00721001" target="_blank" style="color:#a50034;font-size:11px">[첫 구독 혜택↗]</a>
+          <a href="https://www.lge.co.kr/benefits" target="_blank" style="color:#a50034;font-size:11px">[혜택 전체↗]</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 코웨이 -->
+    <div class="card" style="border-top:3px solid #00a5b5">
+      <div class="card-title" style="font-size:14px;color:#00a5b5">코웨이 — 2026 코웨이페스타</div>
+      <div style="font-size:13px;line-height:1.8;color:#444">
+        <div style="background:#f0fafa;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>코웨이페스타</b> (2/26~4/28)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>전제품 최대 15개월 렌탈료 50% 할인</li>
+            <li>2대+ 동시 구매: 약정 내 매월 15% 추가 할인</li>
+            <li>3대+ 패키지: 최대 5개월 추가 반값</li>
+            <li>현대카드/LOCA 11만 캐시백 + 월 최대 4만원</li>
+          </ul>
+          <a href="https://www.coway.com/event/detail?eventno=349" target="_blank" style="color:#00a5b5;font-size:11px">[코웨이페스타↗]</a>
+          <a href="https://www.coway.com/event/package_promo" target="_blank" style="color:#00a5b5;font-size:11px">[패키지↗]</a>
+        </div>
+        <div style="background:#f0fafa;border-radius:6px;padding:12px">
+          <b>타사 보상 프로그램</b> (상시)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>타사 정수기/청정기/비데 교체 시 10% + 월 1만원x12개월</li>
+          </ul>
+          <a href="https://www.coway.com/event/detail?eventno=290" target="_blank" style="color:#00a5b5;font-size:11px">[타사 보상↗]</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SK매직 -->
+    <div class="card" style="border-top:3px solid #e67e22">
+      <div class="card-title" style="font-size:14px;color:#e67e22">SK매직 — 반값 렌탈 + 패키지</div>
+      <div style="font-size:13px;line-height:1.8;color:#444">
+        <div style="background:#fff8f0;border-radius:6px;padding:12px;margin-bottom:12px">
+          <b>다이렉트 반값 렌탈</b> (상시)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>5년 약정 6개월 / 6년 약정 12개월 반값</li>
+            <li>카드 적용 시 정수기/공기청정기 월 0원 가능</li>
+            <li>설치비 + 등록비 100% 면제</li>
+          </ul>
+          <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=3068" target="_blank" style="color:#e67e22;font-size:11px">[다이렉트 구독↗]</a>
+        </div>
+        <div style="background:#fff8f0;border-radius:6px;padding:12px">
+          <b>패키지 + 지인추천</b> (상시)
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>2대 월 5,000원 / 3대 7,500원 / 4대+ 10,500원 할인</li>
+            <li>지인 추천 시 각 5,000P 적립</li>
+          </ul>
+          <a href="https://www.skmagic.com/event/indexEventDetail?eventNo=7937" target="_blank" style="color:#e67e22;font-size:11px">[패키지↗]</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 인사이트 -->
+  <div class="card" style="border-left:4px solid #8e44ad">
+    <div class="card-title">혼수 구독 인사이트</div>
+    <ul style="font-size:13px;line-height:2;color:#444;margin:0;padding-left:20px">
+      <li><b>삼성/LG</b>는 혼수 전용 프로그램(혼수클럽/웨딩멤버스)이 있으나, 대형가전 "구매" 중심 혜택이고 구독 전용 혜택은 제한적</li>
+      <li><b>코웨이</b>가 코웨이페스타(15개월 반값 + 패키지 15%)로 가장 공격적 — 혼수 전용은 아니지만 봄 시즌 타겟</li>
+      <li><b>SK매직</b>은 혼수 전용 없이 상시 반값 + 패키지로 대응 — 환경가전(정수기/비데) 특화</li>
+      <li><b>삼성 대응 포인트</b>: AI 구독클럽 내 혼수 패키지 기획 검토 — 다품목 구독 시 추가 혜택(예: 3품목+ 구독 시 1개월 무료) 등으로 코웨이 대비 차별화 가능</li>
+      <li><b>시장 트렌드</b>: 고물가 시대 혼수 가전의 구독 전환 가속 — 롯데하이마트 웨딩 페어 구독 매출 전년 대비 25%+ 성장</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ==================== TAB: 3월 판매감소 분석 ==================== -->
 <div id="sec-report" class="section">
   <div class="card" style="border-left:4px solid #e74c3c">
     <div class="card-title" style="font-size:18px">📊 2026년 3월 삼성전자 구독판매 감소 원인 분석</div>
