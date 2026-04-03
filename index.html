@@ -335,7 +335,8 @@ a.prod-link:hover { text-decoration: underline; }
       <h1>LG 케어솔루션 경쟁사 구독 전략 대시보드</h1>
       <div class="sub">데이터 기준: W13→W14 (2026-03-30 크롤링) · 보고일: 2026.04.02 · 삼성전자 구독운영그룹</div>
     </div>
-    <button class="btn-excel" onclick="downloadExcel()">📥 Excel 다운로드</button>
+    <button class="btn-excel" onclick="downloadExcel()">📥 분석 데이터</button>
+    <button class="btn-excel" onclick="downloadRawExcel()" style="margin-left:8px">📥 크롤링 로데이터</button>
   </div>
   <div class="tabs">
     <button class="tab active" onclick="showSection('summary', this)">Executive Summary</button>
@@ -2320,6 +2321,62 @@ function downloadExcel() {
 
   const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
   XLSX.writeFile(wb, `경쟁사_구독전략_대시보드_${today}.xlsx`);
+}
+
+function downloadRawExcel() {
+  if(typeof XLSX === 'undefined') { alert('SheetJS 라이브러리 로딩 중입니다. 잠시 후 다시 시도하세요.'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: LG 전체 모델
+  if(lgCurrentPrices && lgCurrentPrices.length > 0) {
+    const lgHeaders = ['카테고리','제품명','모델명','케어플랜','계약기간','월구독료','총구독료','일시불','W11','W12','URL'];
+    const lgRows = lgCurrentPrices.map(m => [m.cat, m.name, m.model, m.plan, m.period||m.term||'', m.price, m.totalSub||'', m.lumpsum||'', m.w11||'', m.w12||'', careTabUrl(m.url)]);
+    const ws1 = XLSX.utils.aoa_to_sheet([lgHeaders, ...lgRows]);
+    XLSX.utils.book_append_sheet(wb, ws1, 'LG전체('+lgCurrentPrices.length+')');
+  }
+
+  // Sheet 2: 삼성 전체 모델
+  if(samsungData && samsungData.length > 0) {
+    const samHeaders = ['브랜드','카테고리','제품명','모델명','구독플랜','계약기간','월구독료','할인전가격','총구독료','일시불','서비스유형','서비스기간','프로모션','URL'];
+    const samRows = samsungData.map(m => [m.brand, m.cat, m.name, m.model, m.plan, m.period, m.price, m.priceBefore||'', m.totalSub||'', m.lumpsum||'', m.svcType||'', m.svcTerm||'', m.promo||'', m.url||m.rawUrl||'']);
+    const ws2 = XLSX.utils.aoa_to_sheet([samHeaders, ...samRows]);
+    XLSX.utils.book_append_sheet(wb, ws2, '삼성전체('+samsungData.length+')');
+  }
+
+  // Sheet 3: 코웨이 전체
+  if(cowayData && cowayData.length > 0) {
+    const cowHeaders = ['브랜드','카테고리','제품명','모델명','구독플랜','계약기간','월구독료','할인전가격','프로모션','URL'];
+    const cowRows = cowayData.map(m => [m.brand, m.cat, m.name, m.model, m.plan, m.period, m.price, m.priceBefore||'', m.promo||'', m.url]);
+    const ws3 = XLSX.utils.aoa_to_sheet([cowHeaders, ...cowRows]);
+    XLSX.utils.book_append_sheet(wb, ws3, '코웨이전체('+cowayData.length+')');
+  }
+
+  // Sheet 4: SK매직 전체
+  if(skmagicData && skmagicData.length > 0) {
+    const skHeaders = ['브랜드','카테고리','제품명','모델명','구독플랜','계약기간','월구독료','할인전가격','프로모션','URL'];
+    const skRows = skmagicData.map(m => [m.brand, m.cat, m.name, m.model, m.plan, m.period, m.price, m.priceBefore||'', m.promo||'', m.url]);
+    const ws4 = XLSX.utils.aoa_to_sheet([skHeaders, ...skRows]);
+    XLSX.utils.book_append_sheet(wb, ws4, 'SK매직전체('+skmagicData.length+')');
+  }
+
+  // Sheet 5: 구독전용 모델
+  if(subOnlyModels && subOnlyModels.length > 0) {
+    const soHeaders = ['카테고리','제품명','모델명','케어플랜','계약기간','월구독료','총구독료','일시불','URL'];
+    const soRows = subOnlyModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.price, m.total||'', m.lumpsum||'', careTabUrl(m.url)]);
+    const ws5 = XLSX.utils.aoa_to_sheet([soHeaders, ...soRows]);
+    XLSX.utils.book_append_sheet(wb, ws5, '구독전용('+subOnlyModels.length+')');
+  }
+
+  // Sheet 6: 닷컴ONLY 모델
+  if(dotcomOnlyModels && dotcomOnlyModels.length > 0) {
+    const doHeaders = ['카테고리','제품명','모델명','케어플랜','계약기간','월구독료','URL'];
+    const doRows = dotcomOnlyModels.map(m => [m.cat, m.name, m.model, m.plan, m.term, m.price, careTabUrl(m.url)]);
+    const ws6 = XLSX.utils.aoa_to_sheet([doHeaders, ...doRows]);
+    XLSX.utils.book_append_sheet(wb, ws6, '닷컴ONLY('+dotcomOnlyModels.length+')');
+  }
+
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  XLSX.writeFile(wb, `크롤링_로데이터_4사_${today}.xlsx`);
 }
 
 // ===== 주차 비교 선택 기능 =====
