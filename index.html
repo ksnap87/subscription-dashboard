@@ -1808,8 +1808,6 @@ function updateNDWeekComparison() {
 
 
   // ── 닷컴ONLY 전용 탭 렌더링 ──
-
-  // ── 닷컴ONLY 전용 탭 렌더링 ──
   const dotcomSet = new Set(dotcomOnlyModels.map(m => m.model));
   const dotcomCats2 = sortByCatOrder([...new Set(dotcomOnlyModels.map(m=>m.cat))]);
   let dotcomKpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">';
@@ -2765,8 +2763,6 @@ function renderPriceInsights(wkLgStats, wkCowayStats, wkSkStats, wkSamStats) {
         noLumpTable.innerHTML += `<tr data-cat="${m.cat}"><td>${i+1}</td><td>${m.cat}</td><td style="text-align:left">${link}</td><td style="font-size:11px;color:#666">${m.model}</td><td>${m.plan||''}</td><td>${m.term||''}</td><td>${fmt(m.price)}원</td><td>${fmt(m.price * parseInt(m.term||'0') * (m.term&&m.term.includes('년') ? 12 : 1))}원</td></tr>`;
       });
     }
-  })();
-})();
 }  // end renderPriceInsights
 
 // 초기 렌더링 — 최신 데이터로 4사 가격 비교 표시
@@ -3383,6 +3379,7 @@ function downloadRawExcel() {
   XLSX.writeFile(wb, `경쟁사_크롤링_로데이터_${today2}.xlsx`);
 }
 
+})();
 </script>
 </body>
 </html>
