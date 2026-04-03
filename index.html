@@ -2495,10 +2495,11 @@ function renderPromoSummaryCards(compData) {
     <div class="card" style="border-left:4px solid #4CAF50"><div style="font-size:15px;font-weight:700;margin-bottom:12px">🔄 타사환승 · 결합할인</div><table style="width:100%;font-size:13px;border-collapse:collapse"><tr style="background:#f8f9fa"><th style="text-align:left;padding:6px 8px;font-weight:600">브랜드</th><th style="text-align:left;padding:6px 8px">환승/결합 혜택</th></tr>${makeRows('switching')}</table></div>`;
 }
 
-// Initial render
-renderPromoTable(competitors);
-renderCompCards(competitors);
-renderPromoSummaryCards(competitors);
+// Initial render — use competitorsByMonth 4월 (latest)
+const activePromoData = competitorsByMonth['4월'] || competitors;
+renderPromoTable(activePromoData);
+renderCompCards(activePromoData);
+renderPromoSummaryCards(activePromoData);
 
 // ===== 삼성 대응 전략 인사이트 =====
 (function() {
