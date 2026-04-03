@@ -2214,9 +2214,6 @@ window.switchWeddingMonth = function(month, el) {
 
 // ===== THREAT TABLE =====
 (function() {
-
-// ===== THREAT TABLE =====
-(function() {
   const tb = document.getElementById('threatTable');
   threatLevels.forEach(t => {
     const rowCount = (t.downCount > 0 ? 1 : 0) + (t.upCount > 0 ? 1 : 0);
@@ -3675,7 +3672,6 @@ function downloadRawExcel() {
   XLSX.writeFile(wb, `경쟁사_크롤링_로데이터_${today2}.xlsx`);
 }
 
-})();
 </script>
 </body>
 </html>
