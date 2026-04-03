@@ -359,29 +359,35 @@ a.prod-link:hover { text-decoration: underline; }
 <div id="sec-summary" class="section active">
 
   <div class="kpi-grid">
-    <div class="kpi-card" style="border-top:3px solid var(--navy)">
+    <div class="kpi-card" style="border-top:3px solid var(--navy);cursor:pointer" onclick="showSection('lineup', document.querySelector('.tab[onclick*=\\'lineup\\']'))">
       <div class="kpi-label">4사 총 모델수</div>
       <div class="kpi-value" id="kpiTotalModels" style="font-size:22px">-</div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px">→ 4사 라인업 현황</div>
     </div>
     <div class="kpi-card blue" onclick="showKpiDetail('total')">
       <div class="kpi-label">가격변동 (W09→W14)</div>
       <div class="kpi-value">54<span class="kpi-unit">건</span></div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px;cursor:pointer" onclick="event.stopPropagation();showSection('top10', document.querySelector('.tab[onclick*=\\'top10\\']'))">→ 품목별 가격변동</div>
     </div>
     <div class="kpi-card red" onclick="showKpiDetail('up')">
       <div class="kpi-label">인상</div>
       <div class="kpi-value">50<span class="kpi-unit">건</span></div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px;cursor:pointer" onclick="event.stopPropagation();showSection('top10', document.querySelector('.tab[onclick*=\\'top10\\']'))">→ 품목별 가격변동</div>
     </div>
     <div class="kpi-card green" onclick="showKpiDetail('down')">
       <div class="kpi-label">인하</div>
       <div class="kpi-value">4<span class="kpi-unit">건</span></div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px;cursor:pointer" onclick="event.stopPropagation();showSection('top10', document.querySelector('.tab[onclick*=\\'top10\\']'))">→ 품목별 가격변동</div>
     </div>
     <div class="kpi-card orange" onclick="showKpiDetail('new')">
       <div class="kpi-label">신규</div>
       <div class="kpi-value">6<span class="kpi-unit">건</span></div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px;cursor:pointer" onclick="event.stopPropagation();showSection('newdisc', document.querySelector('.tab[onclick*=\\'newdisc\\']'))">→ 신규·단종 현황</div>
     </div>
     <div class="kpi-card purple" onclick="showKpiDetail('sub')">
       <div class="kpi-label">구독전용</div>
       <div class="kpi-value">50<span class="kpi-unit">건</span></div>
+      <div style="font-size:10px;color:var(--blue);margin-top:4px;cursor:pointer" onclick="event.stopPropagation();showSection('subsvalue', document.querySelector('.tab[onclick*=\\'subsvalue\\']'))">→ 구독 가성비</div>
     </div>
   </div>
 
@@ -792,6 +798,16 @@ a.prod-link:hover { text-decoration: underline; }
 
 <!-- ==================== TAB: 닷컴ONLY ==================== -->
 <div id="sec-dotcom" class="section">
+  <!-- 주차 선택 -->
+  <div class="card" style="border-left:4px solid #a50034;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:14px;font-weight:600;color:var(--navy)">주차 선택</span>
+      <div id="dotcomWeekPills" class="filter-pills" style="margin-bottom:0"></div>
+      <span id="dotcomWeekSummary" style="font-size:12px;color:#888;margin-left:8px"></span>
+    </div>
+  </div>
+  <!-- 선택된 주차 비교 카드 -->
+  <div id="dotcomWeekCompare" style="display:none;margin-bottom:16px"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
     <div class="card">
       <div class="card-title">닷컴ONLY 모델 수 주간 추이</div>
@@ -820,6 +836,16 @@ a.prod-link:hover { text-decoration: underline; }
 
 <!-- ==================== TAB: 반값할인 ==================== -->
 <div id="sec-halfprice" class="section">
+  <!-- 주차 선택 -->
+  <div class="card" style="border-left:4px solid #e67e22;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:14px;font-weight:600;color:var(--navy)">주차 선택</span>
+      <div id="halfWeekPills" class="filter-pills" style="margin-bottom:0"></div>
+      <span id="halfWeekSummary" style="font-size:12px;color:#888;margin-left:8px"></span>
+    </div>
+  </div>
+  <!-- 선택된 주차 비교 카드 -->
+  <div id="halfWeekCompare" style="display:none;margin-bottom:16px"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
     <div class="card">
       <div class="card-title">반값할인 모델 수 주간 추이</div>
@@ -850,6 +876,29 @@ a.prod-link:hover { text-decoration: underline; }
 
 <div id="sec-wedding" class="section">
 
+  <!-- 월 선택 -->
+  <div class="card" style="border-left:4px solid #8e44ad;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:14px;font-weight:600;color:var(--navy)">기준월 선택</span>
+      <div class="filter-pills" style="margin-bottom:0">
+        <button class="pill" onclick="switchWeddingMonth('mar', this)">3월</button>
+        <button class="pill active" onclick="switchWeddingMonth('apr', this)">4월 (현재)</button>
+      </div>
+      <span id="weddingMonthLabel" style="font-size:12px;color:#888;margin-left:8px">현재: 4월 프로모션 기준</span>
+    </div>
+  </div>
+
+  <!-- 3월 프로모션 (숨김) -->
+  <div id="weddingMarContent" style="display:none">
+    <div class="card" style="border-left:4px solid #888;padding:20px;text-align:center;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:600;color:#666">3월 혼수 프로모션 데이터</div>
+      <p style="font-size:13px;color:#999;margin-top:8px">3월 데이터는 아직 별도 수집되지 않았습니다. 현재 4월 기준 최신 데이터를 확인해 주세요.</p>
+      <p style="font-size:12px;color:#aaa;margin-top:4px">향후 월별 히스토리가 축적되면 자동으로 표시됩니다.</p>
+    </div>
+  </div>
+
+  <!-- 4월 프로모션 (기본 표시) -->
+  <div id="weddingAprContent">
   <!-- 요약 카드 -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
     <div class="card" style="border-top:3px solid #4169E1;text-align:center">
@@ -1060,6 +1109,8 @@ a.prod-link:hover { text-decoration: underline; }
       <li><b>4월 핵심 트렌드</b>: 코웨이페스타 마감(4/28) 앞두고 막판 프로모 경쟁 심화 — LG 정수기 신모델 + 삼성 세일페스타가 동시 진행되며 4강 전면전 양상</li>
     </ul>
   </div>
+
+  </div><!-- /weddingAprContent -->
 
 </div>
 
@@ -1975,6 +2026,185 @@ function updateNDWeekComparison() {
   }
 })();
 
+// ===== 닷컴ONLY & 반값할인 주차 선택 필터 =====
+(function() {
+  const weeks = Object.keys(weeklySnapshots).sort();
+  const weekLabels = { '2026-W09': 'W09', '2026-W11': 'W11', '2026-W12': 'W12', '2026-W13': 'W13', '2026-W14': 'W14' };
+
+  // --- 닷컴ONLY 주차 필터 ---
+  const dotcomPillsEl = document.getElementById('dotcomWeekPills');
+  const dotcomCompareEl = document.getElementById('dotcomWeekCompare');
+  const dotcomSummaryEl = document.getElementById('dotcomWeekSummary');
+  let dotcomSelectedWeeks = new Set([weeks[weeks.length - 1]]);
+
+  function renderDotcomWeekPills() {
+    let html = '';
+    weeks.forEach(w => {
+      const label = weekLabels[w] || w.replace('2026-','');
+      const isActive = dotcomSelectedWeeks.has(w) ? ' active' : '';
+      const isLast = w === weeks[weeks.length - 1] ? ' (현재)' : '';
+      html += `<button class="pill${isActive}" onclick="toggleDotcomWeek('${w}', this)">${label}${isLast}</button>`;
+    });
+    if(dotcomPillsEl) dotcomPillsEl.innerHTML = html;
+  }
+
+  function renderDotcomWeekCompare() {
+    if(dotcomSelectedWeeks.size < 2) {
+      if(dotcomCompareEl) dotcomCompareEl.style.display = 'none';
+      if(dotcomSummaryEl) dotcomSummaryEl.textContent = '주차를 2개 이상 선택하면 비교 카드가 표시됩니다';
+      return;
+    }
+    const sorted = [...dotcomSelectedWeeks].sort();
+    if(dotcomSummaryEl) dotcomSummaryEl.textContent = '선택: ' + sorted.map(w => weekLabels[w] || w.replace('2026-','')).join(', ');
+    let html = '<div class="card"><div class="card-title">주차별 닷컴ONLY 모델 수 비교</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">';
+    sorted.forEach(w => {
+      const snap = weeklySnapshots[w];
+      const label = weekLabels[w] || w.replace('2026-','');
+      html += `<div style="background:#fff5f5;border-radius:10px;padding:14px;text-align:center;border-top:3px solid #a50034">`;
+      html += `<div style="font-size:11px;color:#888">${label}</div>`;
+      html += `<div style="font-size:26px;font-weight:700;color:#a50034">${snap.dotcom}</div>`;
+      html += `<div style="font-size:10px;color:#aaa">닷컴ONLY / 전체 ${snap.total}</div>`;
+      html += '</div>';
+    });
+    html += '</div>';
+    // 카테고리별 비교 테이블
+    const allCats = new Set();
+    sorted.forEach(w => Object.keys(weeklySnapshots[w].dotcom_cats || {}).forEach(c => allCats.add(c)));
+    if(allCats.size > 0) {
+      html += '<div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>카테고리</th>';
+      sorted.forEach(w => { html += `<th>${weekLabels[w] || w.replace('2026-','')}</th>`; });
+      if(sorted.length >= 2) html += '<th>변화</th>';
+      html += '</tr></thead><tbody>';
+      [...allCats].sort().forEach(cat => {
+        html += `<tr><td style="text-align:left;font-weight:600">${cat}</td>`;
+        sorted.forEach(w => { html += `<td>${(weeklySnapshots[w].dotcom_cats || {})[cat] || 0}</td>`; });
+        if(sorted.length >= 2) {
+          const first = (weeklySnapshots[sorted[0]].dotcom_cats || {})[cat] || 0;
+          const last = (weeklySnapshots[sorted[sorted.length-1]].dotcom_cats || {})[cat] || 0;
+          const diff = last - first;
+          const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : '';
+          html += `<td class="${cls}">${diff > 0 ? '+' : ''}${diff}</td>`;
+        }
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    if(dotcomCompareEl) { dotcomCompareEl.innerHTML = html; dotcomCompareEl.style.display = 'block'; }
+  }
+
+  window.toggleDotcomWeek = function(week, el) {
+    if(dotcomSelectedWeeks.has(week)) {
+      if(dotcomSelectedWeeks.size <= 1) return;
+      dotcomSelectedWeeks.delete(week);
+    } else {
+      dotcomSelectedWeeks.add(week);
+    }
+    renderDotcomWeekPills();
+    renderDotcomWeekCompare();
+  };
+
+  renderDotcomWeekPills();
+  renderDotcomWeekCompare();
+
+  // --- 반값할인 주차 필터 ---
+  const halfPillsEl = document.getElementById('halfWeekPills');
+  const halfCompareEl = document.getElementById('halfWeekCompare');
+  const halfSummaryEl = document.getElementById('halfWeekSummary');
+  let halfSelectedWeeks = new Set([weeks[weeks.length - 1]]);
+
+  function renderHalfWeekPills() {
+    let html = '';
+    weeks.forEach(w => {
+      const label = weekLabels[w] || w.replace('2026-','');
+      const isActive = halfSelectedWeeks.has(w) ? ' active' : '';
+      const isLast = w === weeks[weeks.length - 1] ? ' (현재)' : '';
+      html += `<button class="pill${isActive}" onclick="toggleHalfWeek('${w}', this)">${label}${isLast}</button>`;
+    });
+    if(halfPillsEl) halfPillsEl.innerHTML = html;
+  }
+
+  function renderHalfWeekCompare() {
+    if(halfSelectedWeeks.size < 2) {
+      if(halfCompareEl) halfCompareEl.style.display = 'none';
+      if(halfSummaryEl) halfSummaryEl.textContent = '주차를 2개 이상 선택하면 비교 카드가 표시됩니다';
+      return;
+    }
+    const sorted = [...halfSelectedWeeks].sort();
+    if(halfSummaryEl) halfSummaryEl.textContent = '선택: ' + sorted.map(w => weekLabels[w] || w.replace('2026-','')).join(', ');
+    let html = '<div class="card"><div class="card-title">주차별 반값할인 모델 수 비교</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">';
+    sorted.forEach(w => {
+      const snap = weeklySnapshots[w];
+      const label = weekLabels[w] || w.replace('2026-','');
+      html += `<div style="background:#fff8e1;border-radius:10px;padding:14px;text-align:center;border-top:3px solid #e67e22">`;
+      html += `<div style="font-size:11px;color:#888">${label}</div>`;
+      html += `<div style="font-size:26px;font-weight:700;color:#e67e22">${snap.half}</div>`;
+      html += `<div style="font-size:10px;color:#aaa">반값할인 모델</div>`;
+      html += '</div>';
+    });
+    html += '</div>';
+    // 카테고리별 비교
+    const allCats = new Set();
+    sorted.forEach(w => Object.keys(weeklySnapshots[w].half_cats || {}).forEach(c => allCats.add(c)));
+    if(allCats.size > 0) {
+      html += '<div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>카테고리</th>';
+      sorted.forEach(w => { html += `<th>${weekLabels[w] || w.replace('2026-','')}</th>`; });
+      if(sorted.length >= 2) html += '<th>변화</th>';
+      html += '</tr></thead><tbody>';
+      [...allCats].sort().forEach(cat => {
+        html += `<tr><td style="text-align:left;font-weight:600">${cat}</td>`;
+        sorted.forEach(w => { html += `<td>${(weeklySnapshots[w].half_cats || {})[cat] || 0}</td>`; });
+        if(sorted.length >= 2) {
+          const first = (weeklySnapshots[sorted[0]].half_cats || {})[cat] || 0;
+          const last = (weeklySnapshots[sorted[sorted.length-1]].half_cats || {})[cat] || 0;
+          const diff = last - first;
+          const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : '';
+          html += `<td class="${cls}">${diff > 0 ? '+' : ''}${diff}</td>`;
+        }
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    if(halfCompareEl) { halfCompareEl.innerHTML = html; halfCompareEl.style.display = 'block'; }
+  }
+
+  window.toggleHalfWeek = function(week, el) {
+    if(halfSelectedWeeks.has(week)) {
+      if(halfSelectedWeeks.size <= 1) return;
+      halfSelectedWeeks.delete(week);
+    } else {
+      halfSelectedWeeks.add(week);
+    }
+    renderHalfWeekPills();
+    renderHalfWeekCompare();
+  };
+
+  renderHalfWeekPills();
+  renderHalfWeekCompare();
+})();
+
+// ===== 혼수 프로모션 월 선택 =====
+window.switchWeddingMonth = function(month, el) {
+  const pills = el.parentElement.querySelectorAll('.pill');
+  pills.forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const label = document.getElementById('weddingMonthLabel');
+  const marContent = document.getElementById('weddingMarContent');
+  const aprContent = document.getElementById('weddingAprContent');
+  if(month === 'mar') {
+    if(label) label.textContent = '현재: 3월 프로모션 기준';
+    if(marContent) marContent.style.display = 'block';
+    if(aprContent) aprContent.style.display = 'none';
+  } else {
+    if(label) label.textContent = '현재: 4월 프로모션 기준';
+    if(marContent) marContent.style.display = 'none';
+    if(aprContent) aprContent.style.display = 'block';
+  }
+};
+
 // ===== THREAT TABLE =====
 (function() {
 
@@ -2138,8 +2368,28 @@ const samStats = getBrandStats(samsungData, '삼성');
     insights.push(`<strong>⚡ 주목:</strong> ${bigDown.map(d => d.cat).join(', ')} 대폭 인하 — 공격적 가격 전략 감지.`);
   }
 
+  // 인사이트별 탭 연결 매핑
+  const insightNavMap = [
+    { keyword: '인상 카테고리', section: 'top10', tabLabel: '품목별 가격변동' },
+    { keyword: '���하 카테고리', section: 'top10', tabLabel: '품목별 가격변동' },
+    { keyword: '라인업 변동', section: 'newdisc', tabLabel: '신규·단종 현황' },
+    { keyword: '경쟁사 프로모션', section: 'compete', tabLabel: '경쟁사 프��모션 비교' },
+    { keyword: '4사 가격 포지셔닝', section: 'pricecompare', tabLabel: '4사 가격 비교' },
+    { keyword: '구독 가성비', section: 'subsvalue', tabLabel: '구독 가성비' },
+    { keyword: '주목', section: 'top10', tabLabel: '품목별 가격변동' }
+  ];
+
   insights.forEach(text => {
-    il.innerHTML += `<li>${text}</li>`;
+    let navSection = null;
+    let navLabel = '';
+    for(const m of insightNavMap) {
+      if(text.includes(m.keyword)) { navSection = m.section; navLabel = m.tabLabel; break; }
+    }
+    if(navSection) {
+      il.innerHTML += `<li style="cursor:pointer;transition:all 0.15s" onclick="showSection('${navSection}', document.querySelector('.tab[onclick*=\\'${navSection}\\']'))" onmouseover="this.style.background='#eef2ff';this.style.borderLeftColor='var(--blue)'" onmouseout="this.style.background='#f8f9ff';this.style.borderLeftColor='var(--accent)'">${text} <span style="font-size:11px;color:var(--blue);margin-left:4px">→ ${navLabel}</span></li>`;
+    } else {
+      il.innerHTML += `<li>${text}</li>`;
+    }
   });
 })();
 
