@@ -345,6 +345,10 @@ a.prod-link:hover { text-decoration: underline; }
     <button class="tab" onclick="showSection('compete', this)">경쟁사 프로모션 비교</button>
     <button class="tab" onclick="showSection('pricecompare', this)">4사 가격 비교</button>
     <button class="tab" onclick="showSection('subsvalue', this)">구독 가성비</button>
+    <button class="tab" onclick="showSection('lineup', this)">4사 라인업 현황</button>
+    <button class="tab" onclick="showSection('dotcom', this)">닷컴ONLY</button>
+    <button class="tab" onclick="showSection('halfprice', this)">반값할인</button>
+    <button class="tab" onclick="showSection('wedding', this)">혼수 프로모션</button>
     <button class="tab" onclick="showSection('report', this)" style="color:#f39c12;font-weight:600">📊 3월 판매감소 분석</button>
   </div>
 </div>
@@ -2449,7 +2453,7 @@ renderPriceCompareByWeek();
     '이번 기간 신규 <strong>' + newModels.length + '</strong>개 모델, 단종 <strong>' + discModels.length + '</strong>개 모델';
 
   if(sorted.length > 0) {
-    new Chart(document.getElementById('chartNewByCategory'), {
+    ndChart = new Chart(document.getElementById('chartNewByCategory'), {
       type: 'bar',
       data: {
         labels: labels,
