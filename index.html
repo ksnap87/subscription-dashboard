@@ -1796,12 +1796,22 @@ const samStats = getBrandStats(samsungData, '삼성');
     }
   });
 
-  // 삼성: 6년 계약 + 총구독료/일시불 모두 있는 항목
+  // 삼성: 6년 계약 + 총구독료/일시불 모두 있는 항목 (구독전용 모델 제외)
   const samRatio = [];
+  let samSubOnlyCount = 0;
+  const samSubOnlyModels = [];
   samsungData.forEach(item => {
     const ts = Number(item.totalSub), ls = Number(item.lumpsum), price = Number(item.price);
     const per = String(item.period || '');
-    if(per.indexOf('6') >= 0 && ts > 0 && ls > 0 && price > 0) {
+    if(per.indexOf('6') < 0) return;
+    if(price <= 0) return;
+    // 일시불 가격이 없거나 0인 경우 → 구독전용 모델로 판단하여 제외
+    if(!ls || ls <= 0) {
+      samSubOnlyCount++;
+      samSubOnlyModels.push({cat:item.cat, name:item.name, model:item.model, monthly:price, total:ts, url:samProductUrl(item)});
+      return;
+    }
+    if(ts > 0) {
       samRatio.push({brand:'삼성', cat:item.cat, name:item.name, model:item.model, monthly:price, total:ts, lump:ls, ratio:pct(ts,ls), url:samProductUrl(item)});
     }
   });
@@ -1843,6 +1853,17 @@ const samStats = getBrandStats(samsungData, '삼성');
   });
 
   summaryHtml += '</div>';
+
+  // 삼성 구독전용 모델 제외 안내
+  if(samSubOnlyCount > 0) {
+    summaryHtml += '<div style="background:#fff8e1;border-radius:8px;padding:12px 16px;margin-bottom:16px;border-left:3px solid #f39c12">';
+    summaryHtml += '<div style="font-size:13px;font-weight:600;color:#e65100;margin-bottom:4px">삼성 구독전용 모델 ' + samSubOnlyCount + '개 제외됨</div>';
+    summaryHtml += '<div style="font-size:12px;color:#888">일시불 가격이 없는 삼성 구독전용 모델은 총구독료/일시불 비교에서 제외되었습니다.</div>';
+    summaryHtml += '<div style="font-size:11px;color:#aaa;margin-top:4px">제외 모델: ';
+    summaryHtml += samSubOnlyModels.map(function(m){ return m.name + ' (' + m.cat + ')'; }).join(', ');
+    summaryHtml += '</div></div>';
+  }
+
   document.getElementById('subsvalue-summary').innerHTML = summaryHtml;
 
   // 2. 품목별 요약 테이블 — LG vs 삼성 평균비율 + 모델수
@@ -2299,6 +2320,133 @@ function downloadExcel() {
 
   const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
   XLSX.writeFile(wb, `경쟁사_구독전략_대시보드_${today}.xlsx`);
+}
+
+// ===== 주차 비교 선택 기능 =====
+let chartAvgChangeInstance = null;
+let chartTop10ModelsInstance = null;
+
+function getWeekPrice(m, weekKey) {
+  if(weekKey === 'w14') return m.price;
+  return m[weekKey] || null;
+}
+
+function getWeekLabel(weekKey) {
+  return weekKey.toUpperCase();
+}
+
+function updateWeekComparison() {
+  const fromKey = document.getElementById('weekFrom').value;
+  const toKey = document.getElementById('weekTo').value;
+  const fromLabel = getWeekLabel(fromKey);
+  const toLabel = getWeekLabel(toKey);
+
+  if(fromKey === toKey) {
+    alert('같은 주차를 선택할 수 없습니다. 다른 주차를 선택해주세요.');
+    return;
+  }
+
+  document.getElementById('weekCompareLabel').textContent = '현재 비교: ' + fromLabel + ' → ' + toLabel;
+
+  // 1. lgCurrentPrices에서 두 주차 가격이 모두 있는 모델의 변동 계산
+  const changes = [];
+  lgCurrentPrices.forEach(function(m) {
+    const fromP = getWeekPrice(m, fromKey);
+    const toP = getWeekPrice(m, toKey);
+    if(fromP && toP && fromP !== toP) {
+      const diff = toP - fromP;
+      const pctVal = Math.round(diff / fromP * 1000) / 10;
+      changes.push({
+        cat: m.cat, name: m.name, model: m.model,
+        fromPrice: fromP, toPrice: toP,
+        diff: diff, pct: pctVal,
+        url: m.url || ''
+      });
+    }
+  });
+
+  // 2. catData 재계산
+  var catMap = {};
+  changes.forEach(function(c) {
+    if(!catMap[c.cat]) catMap[c.cat] = {cat: c.cat, total: 0, up: 0, down: 0, upAmounts: [], downAmounts: [], maxUp: 0, maxDown: 0, maxUpModel: '', maxUpUrl: '', maxDownModel: '', maxDownUrl: '', avgUp: 0, avgDown: 0};
+    var cd = catMap[c.cat];
+    cd.total++;
+    if(c.diff > 0) {
+      cd.up++;
+      cd.upAmounts.push(c.diff);
+      if(c.diff > cd.maxUp) { cd.maxUp = c.diff; cd.maxUpModel = c.name; cd.maxUpUrl = c.url; }
+    } else {
+      cd.down++;
+      cd.downAmounts.push(Math.abs(c.diff));
+      if(Math.abs(c.diff) > Math.abs(cd.maxDown)) { cd.maxDown = c.diff; cd.maxDownModel = c.name; cd.maxDownUrl = c.url; }
+    }
+  });
+  var newCatData = Object.values(catMap).map(function(cd) {
+    cd.avgUp = cd.upAmounts.length > 0 ? Math.round(cd.upAmounts.reduce(function(s,v){return s+v;}, 0) / cd.upAmounts.length) : 0;
+    cd.avgDown = cd.downAmounts.length > 0 ? Math.round(cd.downAmounts.reduce(function(s,v){return s+v;}, 0) / cd.downAmounts.length) : 0;
+    return cd;
+  });
+  newCatData.sort(function(a,b) { return b.total - a.total; });
+
+  // 3. threatTable 재렌더링
+  var tb = document.getElementById('threatTable');
+  tb.innerHTML = '';
+  var titleEl = document.getElementById('threatTableTitle');
+  if(titleEl) titleEl.textContent = '제품군별 가격 변동 상세 (' + fromLabel + ' → ' + toLabel + ')';
+
+  newCatData.forEach(function(t) {
+    var rowCount = (t.down > 0 ? 1 : 0) + (t.up > 0 ? 1 : 0);
+    if(t.down > 0) {
+      tb.innerHTML += '<tr><td rowspan="'+rowCount+'" style="text-align:left;font-weight:600;vertical-align:middle">'+t.cat+'</td><td><span style="color:#2196F3;font-weight:600">인하</span></td><td>'+t.down+'개</td><td class="down">-'+fmt(t.avgDown)+'원</td><td class="down">'+fmt(t.maxDown)+'원</td><td style="text-align:left;font-size:12px">'+(t.maxDownModel ? (t.maxDownUrl ? '<a href="'+t.maxDownUrl+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+t.maxDownModel+'</a>' : t.maxDownModel) : '-')+'</td></tr>';
+    }
+    if(t.up > 0) {
+      tb.innerHTML += '<tr>'+(t.down === 0 ? '<td rowspan="1" style="text-align:left;font-weight:600;vertical-align:middle">'+t.cat+'</td>' : '')+'<td><span style="color:#e74c3c;font-weight:600">인상</span></td><td>'+t.up+'개</td><td class="up">+'+fmt(t.avgUp)+'원</td><td class="up">+'+fmt(t.maxUp)+'원</td><td style="text-align:left;font-size:12px">'+(t.maxUpModel ? (t.maxUpUrl ? '<a href="'+t.maxUpUrl+'" target="_blank" style="color:inherit;text-decoration:underline dotted">'+t.maxUpModel+'</a>' : t.maxUpModel) : '-')+'</td></tr>';
+    }
+    tb.innerHTML += '<tr><td colspan="6" style="padding:1px;background:#eee"></td></tr>';
+  });
+
+  if(changes.length === 0) {
+    tb.innerHTML = '<tr><td colspan="6" style="padding:20px;color:#999;text-align:center">선택한 주차 간 가격 변동이 없습니다.</td></tr>';
+  }
+
+  // 4. chartAvgChange 재렌더링
+  if(chartAvgChangeInstance) chartAvgChangeInstance.destroy();
+  var topCatsNew = newCatData.slice(0, 10);
+  chartAvgChangeInstance = new Chart(document.getElementById('chartAvgChange'), {
+    type: 'bar',
+    data: {
+      labels: topCatsNew.map(function(d){return d.cat;}),
+      datasets: [
+        { label: '평균 인상', data: topCatsNew.map(function(d){return d.avgUp||0;}), backgroundColor: 'rgba(231,76,60,0.7)', borderColor: '#e74c3c', borderWidth: 1 },
+        { label: '평균 인하', data: topCatsNew.map(function(d){return d.avgDown?-d.avgDown:0;}), backgroundColor: 'rgba(52,152,219,0.7)', borderColor: '#3498db', borderWidth: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + Math.abs(ctx.parsed.x).toLocaleString() + '원'; } } } },
+      scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: function(v) { return (v >= 0 ? '+' : '') + v.toLocaleString(); } } }, y: { grid: { display: false } } }
+    }
+  });
+
+  // 5. chartTop10Models 재렌더링
+  if(chartTop10ModelsInstance) chartTop10ModelsInstance.destroy();
+  var sortedUp = changes.filter(function(c){return c.diff>0;}).sort(function(a,b){return b.diff-a.diff;}).slice(0,5);
+  var sortedDown = changes.filter(function(c){return c.diff<0;}).sort(function(a,b){return a.diff-b.diff;}).slice(0,5);
+  var combined = sortedUp.concat(sortedDown);
+  if(combined.length > 0) {
+    chartTop10ModelsInstance = new Chart(document.getElementById('chartTop10Models'), {
+      type: 'bar',
+      data: {
+        labels: combined.map(function(c){return c.name.length>15?c.name.substring(0,15)+'...':c.name;}),
+        datasets: [{ label: '가격 변동', data: combined.map(function(c){return c.diff;}), backgroundColor: combined.map(function(c){return c.diff>0?'rgba(231,76,60,0.7)':'rgba(52,152,219,0.7)';}), borderColor: combined.map(function(c){return c.diff>0?'#e74c3c':'#3498db';}), borderWidth: 1 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        plugins: { legend: { display: false }, tooltip: { callbacks: { title: function(ctx) { return combined[ctx[0].dataIndex].name; }, label: function(ctx) { var c = combined[ctx.dataIndex]; return (c.diff>0?'+':'')+c.diff.toLocaleString()+'원 ('+(c.pct>0?'+':'')+c.pct+'%)'; } } } },
+        scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: function(v) { return (v >= 0 ? '+' : '') + v.toLocaleString(); } } }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } }
+      }
+    });
+  }
 }
 
 </script>
